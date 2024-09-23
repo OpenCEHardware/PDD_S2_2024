@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1727135358" />
+    <testcase name="tb_generic_fifo" classname="tb_generic_fifo" file="/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/test/tb_generic_fifo.py" lineno="32" time="0.005748748779296875" sim_time_ns="115.001" ratio_time="20004.52697013935" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,35 @@
+# No poner '/' al inicio del path de salida debido a que se toamria como path absoluto
+output_dir: test
+
+
+# Module and dependencies
+# Las dependecias deben darse en paths absolutos
+verilog_sources_and_include_dirs:
+ - verilog_sources:
+   - specific_files:
+   - load_all_from:
+     - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\modules
+ - verilog_include_dirs:
+   - specific_files:
+   - load_all_from:
+     - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\module_dependencies
+
+# Possible simulators are 'verilator' and 'questa'
+simulator: verilator
+timescale_timeprecision: 1ns/1ps
+DUT_name: generic_fifo
+template_name: tb_generic_fifo
+DUT_inputs:
+ - clocks:
+   - aclk
+ - resets:
+   - resetn
+ - data_in
+ - push
+ - pop
+DUT_outputs:
+ - rd_ptr 
+ - wr_ptr
+ - empty
+ - full
+ - data_out
