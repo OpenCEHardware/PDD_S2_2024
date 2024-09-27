@@ -12,10 +12,10 @@ class OS(Enum):
 g_os_name = OS.WINDOWS.value
 
 # Windows default format
-g_TEMPLATE_OPTION_0 = '..\\templates\\arch0.txt'
-g_TEMPLATE_OPTION_1 = '..\\templates\\arch1.txt'
+g_TEMPLATE_OPTION_0 = '..\\templates\\arch_simple.txt'
+g_TEMPLATE_OPTION_1 = '..\\templates\\arch_structured.txt'
 g_TEMPLATE_STRUCTURE_OPTION_0 = '..\\templates\\structure_example_1.txt'
-
+g_SIM_BUILD_PATH = "test\\sim_build"
 
 def recognize_os():
     global g_os_name
@@ -28,12 +28,12 @@ def recognize_os():
 
 
 def covert_template_paths():
-    global g_TEMPLATE_OPTION_0, g_TEMPLATE_OPTION_1, g_TEMPLATE_STRUCTURE_OPTION_0
+    global g_TEMPLATE_OPTION_0, g_TEMPLATE_OPTION_1, g_TEMPLATE_STRUCTURE_OPTION_0, g_SIM_BUILD_PATH
     if(g_os_name == OS.UBUNTU.value):
         g_TEMPLATE_OPTION_0 = windows_to_unix_path(g_TEMPLATE_OPTION_0)
         g_TEMPLATE_OPTION_1 = windows_to_unix_path(g_TEMPLATE_OPTION_1)
         g_TEMPLATE_STRUCTURE_OPTION_0 = windows_to_unix_path(g_TEMPLATE_STRUCTURE_OPTION_0)
-
+        g_SIM_BUILD_PATH = windows_to_unix_path(g_SIM_BUILD_PATH)
 
 def covert_metadata_path(path):
     if(g_os_name == OS.WINDOWS.value):
@@ -56,3 +56,7 @@ def windows_to_wsl_path(windows_path):
         drive_letter = wsl_path[0].lower()
         wsl_path = f'/mnt/{drive_letter}{wsl_path[2:]}'    
     return wsl_path
+
+def is_directory_empty(dir_path):
+    """Check if the specified directory is empty."""
+    return not os.listdir(dir_path)

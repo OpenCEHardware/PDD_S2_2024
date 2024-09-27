@@ -2,6 +2,13 @@
 # to avoid being interpreted as an absolute path on Unix systems.
 output_dir: test
 
+# Template type specifies the type of test architecture used for verification. 
+# Options are 'simple' for a direct assertion-based approach or 'structured' 
+# for a more comprehensive architecture that includes components like scoreboard, 
+# checker, and monitor for detailed validation.
+# template_type: simple
+template_type: structured
+
 # Module and dependencies
 # Section to define Verilog sources and their include directories.
 verilog_sources_and_include_dirs:

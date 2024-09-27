@@ -9,6 +9,7 @@ from pathlib import Path
 class Metadata:
     class Keys(Enum):
         OUTPUT_DIR = 'output_dir'
+        TEMPLATE_TYPE = "template_type"
         VSAID = 'verilog_sources_and_include_dirs'
         VERILOG_SOURCES = 'verilog_sources'
         SPECIFIC_FILES = 'specific_files'
@@ -23,20 +24,31 @@ class Metadata:
         RESETS = 'resets'
         DUT_OUTPUTS = 'DUT_outputs'
 
+    class Template_types(Enum):
+        SIMPLE = 'simple'
+        STRUCTURED = 'structured'
+
     def __init__(self, yaml):
         self.yaml = yaml
-
         dictionary = self.yaml
+
         key = self.Keys.OUTPUT_DIR.value
         if key not in dictionary:
             raise KeyError(f"yaml missing key: {key}")
-        
         else:
-
             if dictionary[key] is None:
                 raise ValueError(f"key: {key} value is invalid")
             else:
                 self.output_dir = yaml[key]
+
+        key = self.Keys.TEMPLATE_TYPE.value
+        if key not in dictionary:
+            raise KeyError(f"yaml missing key: {key}")
+        else:
+            if dictionary[key] is None:
+                raise ValueError(f"key: {key} value is invalid")
+            else:
+                self.template_type = yaml[key]
 
         key = self.Keys.VSAID.value
         if(self.valid_key(dictionary, key)):
@@ -61,7 +73,15 @@ class Metadata:
                     self.convert_paths()
 
 
-        self.simulator = yaml[self.Keys.SIMULATOR.value]
+
+        key = self.Keys.SIMULATOR.value
+        if key not in dictionary:
+            raise KeyError(f"yaml missing key: {key}")
+        else:
+            if dictionary[key] is None:
+                raise ValueError(f"key: {key} value is invalid")
+            else:
+                self.simulator = yaml[key]
 
         timescale_timeprecision=yaml[self.Keys.TIMESCALE_TIMEPRESISION.value]
 
@@ -193,6 +213,7 @@ class Metadata:
 
     def display(self):
         print(f"Output Directory: {self.output_dir}, type: {type(self.output_dir)}")
+        print(f"Template type: {self.template_type}, type: {type(self.template_type)}")
         print(f"Verilog sources and include dirs: {self.VSAID}, type: {type(self.VSAID)}")
         print(f"Simulator: {self.simulator}, type: {type(self.simulator)}")
         print(f"Timescale: {self.timescale_magnitude}{self.timescale_unit}, type: {type(self.timescale_magnitude)} and {type(self.timescale_unit)}")

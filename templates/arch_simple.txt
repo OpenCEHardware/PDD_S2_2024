@@ -39,7 +39,7 @@ async def tb_{{DUT_name}}(dut):
 {{setup_clocks_section}}
 {{setup_resets_section}}
 
-    # Test body\n
+    # Test body
     # Set value example
     # dut.{{some_DUT_input}}.value = 0
 

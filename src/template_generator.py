@@ -160,11 +160,11 @@ def generate_jinja_template(metadata: yr.Metadata, template_option=0) -> str:
     some_DUT_input = ''
     some_DUT_output = ''
 
-    if(template_option == 0):
+    if(template_option == metadata.Template_types.SIMPLE.value):
         with open(U.g_TEMPLATE_OPTION_0, 'r') as file:
             lines = file.readlines()
         template = ''.join(lines)
-    if(template_option == 1):
+    if(template_option == metadata.Template_types.STRUCTURED.value):
         with open(U.g_TEMPLATE_OPTION_1, 'r') as file:
             lines = file.readlines()
         template = ''.join(lines)
@@ -227,7 +227,7 @@ def write_template(filename, rendered_str, directory):
     with open(filepath, 'w') as file:
         file.write(rendered_str)
 
-def gen_template(metadata: yr.Metadata, template_option=0):
+def gen_template(metadata: yr.Metadata, template_option):
     U.print_dash_line()
     print("Generating template")
     rendered_str = generate_jinja_template(metadata, template_option)

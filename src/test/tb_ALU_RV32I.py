@@ -46,8 +46,9 @@ async def tb_ALU_RV32I(dut):
 
 
     # Concurrent tasks
-    cocotb.start_soon(stimulus_generator(dut.a, len_expected_values))
     cocotb.start_soon(stimulus_generator(dut.b, len_expected_values))
+    # Other inputs
+    # cocotb.start_soon(stimulus_generator(dut.other_input, len_expected_values))
 
     # Some output
     cocotb.start_soon(monitor(dut.o, scoreboard))
@@ -106,7 +107,7 @@ class Scoreboard:
             assert obs == exp, (
                 f"Scoreboard error in index {idx}: observed {obs}, expected value {exp}"
             )
-        logger.info("All values match.")
+        logger.info("Scoreboard: All values match.")
 #=======================================================================================================
 # Aux structures
 #=======================================================================================================

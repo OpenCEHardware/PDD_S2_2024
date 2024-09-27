@@ -107,7 +107,7 @@ class Scoreboard:
             assert obs == exp, (
                 f"Scoreboard error in index {idx}: observed {obs}, expected value {exp}"
             )
-        logger.info("All values match.")
+        logger.info("Scoreboard: All values match.")
 {{structure_example_section}}
 {{secuential_functions_header_section}}
 {{clocks_functions_section}}

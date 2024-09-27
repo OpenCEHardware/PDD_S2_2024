@@ -117,5 +117,7 @@ def write_template(filename, rendered_str, directory):
         file.write(rendered_str)
 
 def gen_makefile(metadata: yr.Metadata):
+    U.print_dash_line()
+    print("Generating Makefile")
     rendered_str = generate_jinja_template(metadata)
     write_template("Makefile", rendered_str, metadata.output_dir)

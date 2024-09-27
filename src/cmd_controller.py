@@ -10,6 +10,10 @@ import Utils as U
 
 
 # ================================================================================================================
+g_yaml_path = ''
+g_run_make = False
+g_compile = False
+
 COMMAND = "make"
 
 # Error msgs
@@ -105,13 +109,23 @@ def exec_WSL(comand=COMMAND, dir=None, show=True):
 
 
 def cmd_parser():
-    global g_yaml_path
+    global g_yaml_path, g_run_make, g_compile
     parser = argparse.ArgumentParser(description="Tool entrypoint.")
 
     parser.add_argument(
         "yaml_filepath", 
         type=str,
         help="Filepath of the yaml config file."
+    )
+    parser.add_argument(
+        "--run-make",
+        action="store_true",
+        help="Run make without overwriting template and makefile."
+    )
+    parser.add_argument(
+        "-c",
+        action="store_true",
+        help="Run make without overwriting template and makefile."
     )
     parser.add_argument(
         "--verbose", 
@@ -126,20 +140,56 @@ def cmd_parser():
 
     # set globals values
     g_yaml_path = args.yaml_filepath
-
+    g_run_make = args.run_make
+    g_compile = args.c
 
 if __name__ == "__main__":
     U.recognize_os()
     cmd_parser()
+
     metadata = yr.read_yaml(g_yaml_path)
-    tg.gen_template(metadata, template_option=1)
-    mg.gen_makefile(metadata)
+
+    if(not g_run_make):
+        tg.gen_template(metadata, template_option=metadata.template_type)
+        mg.gen_makefile(metadata)
+    else:
+        U.print_dash_line()
+        print("Using current template")
 
     if(U.g_os_name == U.OS.WINDOWS.value):
         has_wsl = check_wsl_installed()
         if(has_wsl):
-            exec_WSL(dir=metadata.output_dir, show=False)
-            exec_WSL(dir=metadata.output_dir)
+
+            sim_build_path = Path(U.g_SIM_BUILD_PATH)
+            if sim_build_path.is_dir():
+                if U.is_directory_empty(U.g_SIM_BUILD_PATH):
+                    if(g_compile):
+                        U.print_dash_line()
+                        print("Retrying compilation")
+                        exec_WSL(dir=metadata.output_dir)
+                    else:
+                        U.print_dash_line()
+                        print("sim_build exists but cannot compile")
+
+                else:
+                    if(g_compile):
+                        U.print_dash_line()
+                        print("Done")
+                    else:
+                        U.print_dash_line()
+                        print("Running")
+                        exec_WSL(dir=metadata.output_dir)
+            else:
+                if(g_compile):
+                    U.print_dash_line()
+                    print("Compiling")
+                    exec_WSL(dir=metadata.output_dir)
+                else:
+                    U.print_dash_line()
+                    print("Compiling and running")
+                    exec_WSL(dir=metadata.output_dir, show=False)
+                    exec_WSL(dir=metadata.output_dir)
+
     else:
         print("UBUNTU TO DO")
 

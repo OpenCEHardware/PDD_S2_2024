@@ -36,6 +36,6 @@ pip install -r requirements.txt
 
 ## Usage
 
-### 1. Open PowerShell in the `src` directory.
-### 2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
-### 3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
+1. Open PowerShell in the `src` directory.
+2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
+3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
