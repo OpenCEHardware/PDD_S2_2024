@@ -12,7 +12,7 @@ This tool automates the creation of testbenches for hardware modules written in 
 - **Makefile Generation**: Creates a Makefile that runs the cocotb testbench with the selected simulator.
 - **Cross-Platform Support**: Works on both Linux (Ubuntu) and Windows environments.
 
-## Usage
+## Setup
 
 ### 1. Prerequisites
 
@@ -32,12 +32,10 @@ Clone the repository and install the required Python packages.
 git clone https://github.com/MajinLoop/PDD_S2_2024.git
 cd <your-repo-directory>
 pip install -r requirements.txt
+```
 
+## Usage
 
-
-# PDD_S2_2024
-
-## Uso
-### 1. Abrir powershell en la carpeta src
-### 2. ejecutar el comando python .\cmd_controller.py ruta\al\yaml_file
-### 3. Esto generará una carpeta "test" en la ubicación especificada en el yaml, concretamente dada por la llave "output_dir"
+### 1. Open PowerShell in the `src` directory.
+### 2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
+### 3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
