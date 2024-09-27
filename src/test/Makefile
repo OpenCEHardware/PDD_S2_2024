@@ -3,11 +3,11 @@
 
 SIM = verilator
 TOPLEVEL_LANG = verilog
-SV_DIRS = /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/modules
+SV_DIRS = /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU
 VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))
-VERILOG_INCLUDE_DIRS = /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/module_dependencies
-TOPLEVEL = generic_fifo
-MODULE = tb_generic_fifo
+
+TOPLEVEL = ALU_RV32I
+MODULE = tb_ALU_RV32I
 COCOTB_HDL_TIMEUNIT = 1ns
 COCOTB_HDL_TIMEPRECISION = 1ps
 

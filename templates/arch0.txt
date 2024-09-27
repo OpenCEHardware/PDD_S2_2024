@@ -1,0 +1,57 @@
+#=======================================================================================================
+# Imports
+#=======================================================================================================
+import cocotb
+from cocotb.triggers import Timer
+import logging
+
+from cocotb.clock import Clock
+from cocotb.triggers import RisingEdge
+from cocotb.triggers import FallingEdge
+
+# For cocotb events
+# https://docs.cocotb.org/en/stable/triggers.html
+
+from enum import Enum
+import random
+import time
+#=======================================================================================================
+# Settings
+#=======================================================================================================
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG) # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+#=======================================================================================================
+# Globals
+#=======================================================================================================
+g_time_unit = '{{timescale_unit}}'
+SIGNAL_X = -1
+SIGNAL_Z = -2
+#=======================================================================================================
+# Tests
+#=======================================================================================================
+@cocotb.test()
+async def tb_{{DUT_name}}(dut):
+    # Wait some time
+    await Timer(100, units='{{timescale_unit}}')
+    
+    start_time = time.perf_counter()
+
+{{setup_clocks_section}}
+{{setup_resets_section}}
+
+    # Test body\n
+    # Set value example
+    # dut.{{some_DUT_input}}.value = 0
+
+    # Print example
+    logger.info("Hello world")
+{{structure_example_section}}
+{{secuential_functions_header_section}}
+{{clocks_functions_section}}
+{{resets_functions_section}}
+#=======================================================================================================
+# Aux tasks
+#=======================================================================================================
+# To get simulation time
+def get_real_time(start_time):
+    return time.perf_counter() - start_time

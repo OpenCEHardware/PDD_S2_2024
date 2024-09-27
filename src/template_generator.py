@@ -24,6 +24,11 @@ g_DEFAULT_RESET_DURATION_MAGNITUDE = 10
 g_indent_level = 4
 g_indent = ' ' * g_indent_level
 
+
+g_SECUENTIAL_FUNCTIONS_HEADER = """#=======================================================================================================
+# Handle secuential signals
+#=======================================================================================================
+"""
 g_CLOCK_FUNCTIONS = """async def start_clock(clock, period, units='{{timescale_unit}}'):
         clock_instance = Clock(clock, period, units=units)
         cocotb.start_soon(clock_instance.start())
@@ -74,6 +79,11 @@ def has_inputs(metadata: yr.Metadata) -> bool:
     except (IndexError, KeyError):
         return False
 
+def has_outputs(metadata: yr.Metadata) -> bool:
+    try:
+        return (metadata.DUT_outputs[0] is not None)
+    except (IndexError, KeyError):
+        return False
 
 def has_clocks(metadata: yr.Metadata) -> bool:
     try:
@@ -81,10 +91,10 @@ def has_clocks(metadata: yr.Metadata) -> bool:
     except (IndexError, KeyError):
         return False
 
-def initiate_clocks(metadata: yr.Metadata) -> str:
+def get_initiate_clocks_section(metadata: yr.Metadata) -> str:
     clocks_names_list = metadata.DUT_inputs[0][metadata.Keys.CLOCKS.value]
     
-    if(len(clocks_names_list) == 1  ):
+    if(len(clocks_names_list) == 1):
         template_section = f"{g_indent}# Initiate clock\n"
         template_section += f"{g_indent}await start_clock(dut.{clocks_names_list[0]}, period={g_DEFAULT_CLOCK_PERIOD_TIME_MAGNITUDE}, units='{metadata.timescale_unit}')"
 
@@ -109,7 +119,7 @@ def has_resets(metadata: yr.Metadata) -> bool:
     except (IndexError, KeyError):
         return False
 
-def handle_resets(metadata: yr.Metadata) -> str:
+def get_handle_resets_section(metadata: yr.Metadata) -> str:
     resets_names_list = metadata.DUT_inputs[1][metadata.Keys.RESETS.value]
     
     if(len(resets_names_list) == 1):
@@ -132,156 +142,93 @@ def handle_resets(metadata: yr.Metadata) -> str:
     return template_section
 
 
-def generate_jinja_template(metadata: yr.Metadata) -> str:
-    template = """#=======================================================================================================
-# Imports
-#=======================================================================================================
-import cocotb
-from cocotb.triggers import Timer
-import logging
+def generate_jinja_template(metadata: yr.Metadata, template_option=0) -> str:
+    has_clocks_ = has_clocks(metadata)
+    has_resets_ = has_resets(metadata)
+    has_inputs_ = has_inputs(metadata)
+    has_outputs_ = has_outputs(metadata)
+    add_structure_example = True
 
-from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge
-from cocotb.triggers import FallingEdge
+    template = ''
+    setup_clocks_section = ''
+    setup_resets_section = ''
+    structure_example_section = ''
+    secuential_functions_header_section = ''
+    clocks_functions_section = ''
+    resets_functions_section = ''
+    some_clock = ''
+    some_DUT_input = ''
+    some_DUT_output = ''
 
-# For cocotb events
-# https://docs.cocotb.org/en/stable/triggers.html
+    if(template_option == 0):
+        with open(U.g_TEMPLATE_OPTION_0, 'r') as file:
+            lines = file.readlines()
+        template = ''.join(lines)
+    if(template_option == 1):
+        with open(U.g_TEMPLATE_OPTION_1, 'r') as file:
+            lines = file.readlines()
+        template = ''.join(lines)
 
-from enum import Enum
-import random
-import time
-#=======================================================================================================
-# Settings
-#=======================================================================================================
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-#=======================================================================================================
-# Globals
-#=======================================================================================================
-g_time_unit = '{{timescale_unit}}'
-SIGNAL_X = -1
-SIGNAL_Z = -2
-#=======================================================================================================
-# Tests
-#=======================================================================================================
-@cocotb.test()
-async def tb_{{DUT_name}}(dut):
-    start_time = time.perf_counter()"""
-
-    # Set up clocks section
-    if(has_clocks(metadata)):
-        template += "\n\n" + initiate_clocks(metadata) + """\n\n{{g_indent}}# Wait some time
-    await Timer(100, units='{{timescale_unit}}')"""
-        
-    # Set up resets section
-    if(has_resets(metadata)):
-        template += "\n\n" + handle_resets(metadata)
-
-    template += """\n\n{{g_indent}}# Test body\n
-    # Set value example
-    # dut.{{some_DUT_value}}.value = 0
-
-    # Print example
-    logger.info("Hello world")
-#=======================================================================================================
-# Aux structures
-#=======================================================================================================
-class State(Enum):
-    START  = 0
-    IDLE   = 1
-    READY  = 2
-    FKD_UP = SIGNAL_X
-
-    def get_random_state():
-        return random.choice(list(State)).value
-
-    # end index is exclusive
-    def get_random_state_contrained(start_index, end_index):
-        return random.choice(list(State)[start_index:end_index]).value
-
-# Struct example
-class Packet():
-    def __init__(self, header, opcode, data, error, state):
-        self.header = header
-        self.opcode = opcode
-        self.data = data
-        self.error = error
-        self.state = state
-    
-    def to_bits(self):
-        # if self.state == State.FKD_UP.value:
-        #     raise ValueError("State FKD_UP cannot be directly represented as a valid integer.")
-
-        packet_value = (self.header << (4 + 64 + 4 + 4)) | \\
-                       (self.opcode << (64 + 4 + 4)) | \\
-                       (self.data << (4 + 4)) | \\
-                       (self.error << 4) | \\
-                       self.state
-        return packet_value
-
-    def __repr__(self):
-            return f"Packet(header={self.header:x}, opcode={self.opcode:x}, data={self.data:x}, error={self.error:x}, state={self.state})"
-"""
-
-    if(has_clocks(metadata) or has_resets(metadata)):
-        template += """#=======================================================================================================
-# Handle secuential signals
-#=======================================================================================================
-"""
-
-    if(has_clocks(metadata)):
-        template += g_CLOCK_FUNCTIONS
-
-    if(has_clocks(metadata) and has_resets(metadata)):
-        template += "\n"
-
-    if(has_resets(metadata)):
-        template += g_RESET_FUNCTIONS
-    
-    template +="""#=======================================================================================================
-# Aux tasks
-#======================================================================================================="""
-
-    if(has_clocks(metadata)):
-        template += "\n" + g_CLASS_INSTANCE_USAGE + "\n"
-    
-    template += """# To get simulation time
-def get_real_time(start_time):
-    return time.perf_counter() - start_time
-"""
-
-    template_instance = Template(template)
-
-    if(has_clocks(metadata)):
+    if(has_clocks_):
+        setup_clocks_section = get_initiate_clocks_section(metadata)
+        clocks_functions_section += g_CLOCK_FUNCTIONS
         some_clock = metadata.DUT_inputs[0][metadata.Keys.CLOCKS.value][0]
     else:
         some_clock = "some_clock"
 
-    if(has_inputs(metadata)):
-        some_value = metadata.DUT_inputs[-1]
+    if(has_resets_):
+        setup_resets_section += "\n\n" + get_handle_resets_section(metadata)
+        resets_functions_section += g_RESET_FUNCTIONS
+
+    if(add_structure_example):
+        with open(U.windows_to_unix_path(U.g_TEMPLATE_STRUCTURE_OPTION_0), 'r') as file:
+            lines = file.readlines()
+        structure_example_section = ''.join(lines)
+
+    if(has_clocks_ or has_resets_):
+        secuential_functions_header_section = g_SECUENTIAL_FUNCTIONS_HEADER
+
+    if(has_clocks_ and has_resets_):
+        template += "\n"
+
+    template_instance = Template(template)
+
+    if(has_inputs_):
+        some_DUT_input = metadata.DUT_inputs[-1]
     else:
-        some_value = "input"
+        some_DUT_input = "some_input"
+
+    if(has_outputs_):
+        some_DUT_output = metadata.DUT_outputs[0]
+    else:
+        some_DUT_output = "some_output"
 
     context = {
         "timescale_unit": metadata.timescale_unit,
         "DUT_name": metadata.DUT_name,
         "g_indent" : g_indent,
+        "setup_clocks_section" : setup_clocks_section,
+        "setup_resets_section" : setup_resets_section,
+        "structure_example_section" : structure_example_section,
+        "secuential_functions_header_section" : secuential_functions_header_section,
+        "clocks_functions_section" : clocks_functions_section,
+        "resets_functions_section" : resets_functions_section,
         "some_clock" : some_clock,
-        "some_DUT_value" : some_value
+        "some_DUT_input" : some_DUT_input,
+        "some_DUT_output" : some_DUT_output
     }
 
     rendered_str = template_instance.render(context)
     return rendered_str
 
 def write_template(filename, rendered_str, directory):
-    # print(f"metadata.output_dir: {directory}")
     """Writes the python test template."""
     filepath = os.path.join(directory, filename)
     with open(filepath, 'w') as file:
         file.write(rendered_str)
 
-def gen_template(metadata: yr.Metadata):
+def gen_template(metadata: yr.Metadata, template_option=0):
     U.print_dash_line()
     print("Generating template")
-    rendered_str = generate_jinja_template(metadata)
+    rendered_str = generate_jinja_template(metadata, template_option)
     write_template(f"{metadata.template_name}.py", rendered_str, directory=metadata.output_dir)

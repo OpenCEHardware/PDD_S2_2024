@@ -21,16 +21,16 @@ def gen_verilog_sources(metadata: yr.Metadata) -> str:
     plus = ""
 
     if(metadata.verilog_sources_load_all_from != []):
+        if(metadata.verilog_sources_load_all_from[0] is not None):
+            template_section = "SV_DIRS = "
+            for filepath in metadata.verilog_sources_load_all_from:
+                if(filepath != metadata.verilog_sources_load_all_from[-1]):
+                    template_section += filepath + " "
+                else:
+                    template_section += filepath
 
-        template_section = "SV_DIRS = "
-        for filepath in metadata.verilog_sources_load_all_from:
-            if(filepath != metadata.verilog_sources_load_all_from[-1]):
-                template_section += filepath + " "
-            else:
-                template_section += filepath
-
-        template_section += "\n" + """VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))"""
-        plus = "+"
+            template_section += "\n" + """VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))"""
+            plus = "+"
 
     if(metadata.verilog_sources_specific_files != []):
         template_section += "VERILOG_SOURCES " + plus + "= "

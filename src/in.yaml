@@ -1,35 +1,52 @@
-# No poner '/' al inicio del path de salida debido a que se toamria como path absoluto
+# Output directory where files will be generated. Do not start with '/' 
+# to avoid being interpreted as an absolute path on Unix systems.
 output_dir: test
 
-
 # Module and dependencies
-# Las dependecias deben darse en paths absolutos
+# Section to define Verilog sources and their include directories.
 verilog_sources_and_include_dirs:
- - verilog_sources:
-   - specific_files:
-   - load_all_from:
-     - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\modules
- - verilog_include_dirs:
-   - specific_files:
-   - load_all_from:
-     - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\module_dependencies
+  # List of Verilog files to be used in the simulation.
+  - verilog_sources:
+    # Section to specify individual Verilog files.
+    - specific_files: # (Empty, files can be added here if needed)
+    
+    # Directory to load all Verilog files from the specified paths.
+    - load_all_from:
+      - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\ALU  # Absolute path to Verilog files.
 
-# Possible simulators are 'verilator' and 'questa'
+  # Include directories for Verilog files. These usually contain shared macros or definitions.
+  - verilog_include_dirs:
+    # Section to specify individual include files.
+    - specific_files: 
+
+    # Directory to load all include files from the specified ptahs.
+    - load_all_from: # (Not defined, can be specified later)
+
+# Simulator to be used for the simulation. Options are 'verilator' or 'questa'.
 simulator: verilator
+
+# Time scale and precision for the simulation (1ns for time, 1ps for precision).
 timescale_timeprecision: 1ns/1ps
-DUT_name: generic_fifo
-template_name: tb_generic_fifo
+
+# Name of the DUT (Device Under Test), which is the Verilog module being tested (do not use the extention).
+DUT_name: ALU_RV32I
+
+# Name of the testbench template to be used for the DUT (do not use the extention).
+template_name: tb_ALU_RV32I
+
+# Definition of DUT inputs.
 DUT_inputs:
- - clocks:
-   - aclk
- - resets:
-   - resetn
- - data_in
- - push
- - pop
+  # List of clock signals that control the DUT.
+  - clocks:
+  
+  # List of reset signals for the DUT.
+  - resets:
+  
+  # The rest of input signals.
+  - op
+  - a  
+  - b
+
+# Definition of DUT outputs.
 DUT_outputs:
- - rd_ptr 
- - wr_ptr
- - empty
- - full
- - data_out
+  - o

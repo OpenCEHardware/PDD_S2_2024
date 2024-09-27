@@ -11,7 +11,6 @@ import Utils as U
 
 # ================================================================================================================
 COMMAND = "make"
-COMPILED_FILES_DIR = "sim_build"
 
 # Error msgs
 NO_WSL_MSG_ERR_STR = "Windows Subsystem for Linux has not been enabled"
@@ -130,20 +129,19 @@ def cmd_parser():
 
 
 if __name__ == "__main__":
-    has_wsl = check_wsl_installed()
-    if(has_wsl):
-        cmd_parser()
-        metadata = yr.read_yaml(g_yaml_path)
-        tg.gen_template(metadata)
-        mg.gen_makefile(metadata)
+    U.recognize_os()
+    cmd_parser()
+    metadata = yr.read_yaml(g_yaml_path)
+    tg.gen_template(metadata, template_option=1)
+    mg.gen_makefile(metadata)
 
-        exec_WSL(dir=metadata.output_dir, show=False)
-        exec_WSL(dir=metadata.output_dir)
-
-
-
-
-
+    if(U.g_os_name == U.OS.WINDOWS.value):
+        has_wsl = check_wsl_installed()
+        if(has_wsl):
+            exec_WSL(dir=metadata.output_dir, show=False)
+            exec_WSL(dir=metadata.output_dir)
+    else:
+        print("UBUNTU TO DO")
 
 
 

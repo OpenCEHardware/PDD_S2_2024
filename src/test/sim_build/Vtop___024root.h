@@ -14,45 +14,80 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final : public VerilatedModule
   public:
 
     // DESIGN SPECIFIC STATE
-    VL_IN8(aclk,0,0);
-    VL_IN8(resetn,0,0);
-    VL_IN8(push,0,0);
-    VL_IN8(pop,0,0);
-    VL_OUT8(rd_ptr,0,0);
-    VL_OUT8(wr_ptr,0,0);
-    VL_OUT8(empty,0,0);
-    VL_OUT8(full,0,0);
-    CData/*0:0*/ generic_fifo__DOT__aclk;
-    CData/*0:0*/ generic_fifo__DOT__resetn;
-    CData/*0:0*/ generic_fifo__DOT__push;
-    CData/*0:0*/ generic_fifo__DOT__pop;
-    CData/*0:0*/ generic_fifo__DOT__rd_ptr;
-    CData/*0:0*/ generic_fifo__DOT__wr_ptr;
-    CData/*0:0*/ generic_fifo__DOT__empty;
-    CData/*0:0*/ generic_fifo__DOT__full;
-    CData/*1:0*/ generic_fifo__DOT__count;
+    VL_IN8(op,3,0);
+    VL_IN8(a,3,0);
+    VL_IN8(b,3,0);
+    VL_OUT8(o,3,0);
+    CData/*3:0*/ ALU_RV32I__DOT__op;
+    CData/*3:0*/ ALU_RV32I__DOT__a;
+    CData/*3:0*/ ALU_RV32I__DOT__b;
+    CData/*3:0*/ ALU_RV32I__DOT__o;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub_o;
+    CData/*3:0*/ ALU_RV32I__DOT__a_signed_for_shift_right_arithmetic;
+    CData/*3:0*/ ALU_RV32I__DOT__slt_o;
+    CData/*3:0*/ ALU_RV32I__DOT__abs_o;
+    CData/*0:0*/ ALU_RV32I__DOT__add_sub__DOT__op;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__a;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__b;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__o;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__b_a1;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__a1__DOT__a;
+    CData/*0:0*/ ALU_RV32I__DOT__add_sub__DOT__a1__DOT__on;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__a1__DOT__a1;
+    CData/*0:0*/ ALU_RV32I__DOT__add_sub__DOT__adder__DOT__ci;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__adder__DOT__A;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__adder__DOT__B;
+    CData/*3:0*/ ALU_RV32I__DOT__add_sub__DOT__adder__DOT__O;
+    CData/*0:0*/ ALU_RV32I__DOT__slt__DOT__unsigned_;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__a;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__b;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__o;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__adder_o;
+    CData/*0:0*/ ALU_RV32I__DOT__slt__DOT__co;
+    CData/*0:0*/ ALU_RV32I__DOT__slt__DOT__o_aux;
+    CData/*0:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__ci;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__A;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__B;
+    CData/*3:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__O;
+    CData/*0:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__co;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__A;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__abs_A;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__adder_o;
+    CData/*0:0*/ ALU_RV32I__DOT__abs__DOT__add__DOT__ci;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__add__DOT__A;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__add__DOT__B;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__add__DOT__O;
+    CData/*0:0*/ ALU_RV32I__DOT__abs__DOT__mux__DOT__select;
+    CData/*7:0*/ ALU_RV32I__DOT__abs__DOT__mux__DOT__channels;
+    CData/*3:0*/ ALU_RV32I__DOT__abs__DOT__mux__DOT__channel_out;
+    CData/*3:0*/ ALU_RV32I__DOT__mux__DOT__select;
+    QData/*63:0*/ ALU_RV32I__DOT__mux__DOT__channels;
+    CData/*3:0*/ ALU_RV32I__DOT__mux__DOT__channel_out;
     CData/*0:0*/ __VstlFirstIteration;
     CData/*0:0*/ __VicoFirstIteration;
-    CData/*0:0*/ __Vtrigprevexpr___TOP__aclk__0;
     CData/*0:0*/ __VactContinue;
-    IData/*31:0*/ generic_fifo__DOT__unnamedblk1__DOT__i;
     IData/*31:0*/ __VactIterCount;
-    VL_INW(data_in,83,0,3);
-    VL_OUTW(data_out,83,0,3);
-    VlWide<3>/*83:0*/ generic_fifo__DOT__data_in;
-    VlWide<3>/*83:0*/ generic_fifo__DOT__data_out;
-    VlUnpacked<VlWide<3>/*83:0*/, 2> generic_fifo__DOT__mem;
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;
-    VlTriggerVec<1> __VactTriggered;
-    VlTriggerVec<1> __VnbaTriggered;
+    VlTriggerVec<0> __VactTriggered;
+    VlTriggerVec<0> __VnbaTriggered;
 
     // INTERNAL VARIABLES
     Vtop__Syms* const vlSymsp;
 
     // PARAMETERS
-    static constexpr IData/*31:0*/ generic_fifo__DOT__DEPTH = 2U;
-    static constexpr IData/*31:0*/ generic_fifo__DOT__COUNT_SIZE = 1U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__add_sub__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__add_sub__DOT__a1__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__add_sub__DOT__adder__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__slt__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__slt__DOT__adder__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__abs__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__abs__DOT__add__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__abs__DOT__mux__DOT__M = 2U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__abs__DOT__mux__DOT__N = 4U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__mux__DOT__M = 0x00000010U;
+    static constexpr IData/*31:0*/ ALU_RV32I__DOT__mux__DOT__N = 4U;
 
     // CONSTRUCTORS
     Vtop___024root(Vtop__Syms* symsp, const char* v__name);

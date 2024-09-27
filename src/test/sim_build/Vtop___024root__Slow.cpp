@@ -7,8 +7,18 @@
 #include "Vtop___024root.h"
 
 // Parameter definitions for Vtop___024root
-constexpr IData/*31:0*/ Vtop___024root::generic_fifo__DOT__DEPTH;
-constexpr IData/*31:0*/ Vtop___024root::generic_fifo__DOT__COUNT_SIZE;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__add_sub__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__add_sub__DOT__a1__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__add_sub__DOT__adder__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__slt__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__slt__DOT__adder__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__abs__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__abs__DOT__add__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__abs__DOT__mux__DOT__M;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__abs__DOT__mux__DOT__N;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__mux__DOT__M;
+constexpr IData/*31:0*/ Vtop___024root::ALU_RV32I__DOT__mux__DOT__N;
 
 
 void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf);

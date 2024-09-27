@@ -60,6 +60,7 @@ class Metadata:
                     self.verify_paths()
                     self.convert_paths()
 
+
         self.simulator = yaml[self.Keys.SIMULATOR.value]
 
         timescale_timeprecision=yaml[self.Keys.TIMESCALE_TIMEPRESISION.value]
@@ -139,6 +140,7 @@ class Metadata:
             raise ValueError(f"The value: {self.output_dir} must be a directory")
         if not path.is_dir():
             path.mkdir(parents=True, exist_ok=True)
+
         for filepath in self.verilog_sources_specific_files:
             path = Path(filepath)
             if not path.is_file():
@@ -165,16 +167,16 @@ class Metadata:
         # self.output_dir = U.windows_to_wsl_path(self.output_dir)
 
         for i in range(len(self.verilog_sources_specific_files)):
-            self.verilog_sources_specific_files[i] = U.windows_to_wsl_path(self.verilog_sources_specific_files[i])
+            self.verilog_sources_specific_files[i] = U.covert_metadata_path(self.verilog_sources_specific_files[i])
 
         for i in range(len(self.verilog_sources_load_all_from)):
-            self.verilog_sources_load_all_from[i] = U.windows_to_wsl_path(self.verilog_sources_load_all_from[i])
+            self.verilog_sources_load_all_from[i] = U.covert_metadata_path(self.verilog_sources_load_all_from[i])
 
         for i in range(len(self.verilog_include_dirs_specific_files)):
-            self.verilog_include_dirs_specific_files[i] = U.windows_to_wsl_path(self.verilog_include_dirs_specific_files[i])
+            self.verilog_include_dirs_specific_files[i] = U.covert_metadata_path(self.verilog_include_dirs_specific_files[i])
 
         for i in range(len(self.verilog_include_dirs_load_all_from)):
-            self.verilog_include_dirs_load_all_from[i] = U.windows_to_wsl_path(self.verilog_include_dirs_load_all_from[i])
+            self.verilog_include_dirs_load_all_from[i] = U.covert_metadata_path(self.verilog_include_dirs_load_all_from[i])
 
 
     def has_attribute(self, attr_name):

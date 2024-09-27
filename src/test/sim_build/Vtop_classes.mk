@@ -32,8 +32,6 @@ VM_CLASSES_SLOW += \
 	Vtop___024root__Slow \
 	Vtop___024root__DepSet_h84412442__0__Slow \
 	Vtop___024root__DepSet_heccd7ead__0__Slow \
-	Vtop___024unit__Slow \
-	Vtop___024unit__DepSet_hff17caec__0__Slow \
 
 # Generated support classes, fast-path, compile with highest optimization
 VM_SUPPORT_FAST += \

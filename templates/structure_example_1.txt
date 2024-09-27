@@ -1,0 +1,37 @@
+#=======================================================================================================
+# Aux structures
+#=======================================================================================================
+class State(Enum):
+    START  = 0
+    IDLE   = 1
+    READY  = 2
+    INCORRECT = SIGNAL_X
+
+    def get_random_state():
+        return random.choice(list(State)).value
+
+    # end index is exclusive
+    def get_random_state_contrained(start_index, end_index):
+        return random.choice(list(State)[start_index:end_index]).value
+
+# Struct example
+class Some_class():
+    def __init__(self, atribute_1, atribute_2, some_state):
+        self.atribute_1 = atribute_1
+        self.atribute_2 = atribute_2
+        self.some_state = some_state
+    
+    def to_bits(self):
+        # if self.some_state == State.INCORRECT.value:
+        #     raise ValueError("State INCORRECT cannot be directly represented as a valid integer.")
+
+        # this example asumes atribute_1 as 4 bits
+        # this example asumes atribute_2 as 64 bits
+        # this example asumes some_state as 4 bits
+        some_class_value = (self.atribute_1 << (64 + 4)) | \
+                       (self.atribute_2 << 4) | \
+                       self.some_state
+        return some_class_value
+
+    def __repr__(self):
+            return f"Some_class(atribute 1={self.atribute_1:x}, atribute 2={self.atribute_2:x}, state={self.some_state})"

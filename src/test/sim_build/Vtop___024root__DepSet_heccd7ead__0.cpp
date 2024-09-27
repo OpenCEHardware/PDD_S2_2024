@@ -23,24 +23,164 @@ VL_INLINE_OPT void Vtop___024root___ico_sequent__TOP__0(Vtop___024root* vlSelf) 
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___ico_sequent__TOP__0\n"); );
     auto &vlSelfRef = std::ref(*vlSelf).get();
+    // Init
+    QData/*63:0*/ ALU_RV32I__DOT____Vcellinp__mux__channels;
+    ALU_RV32I__DOT____Vcellinp__mux__channels = 0;
+    CData/*7:0*/ ALU_RV32I__DOT__abs__DOT____Vcellinp__mux__channels;
+    ALU_RV32I__DOT__abs__DOT____Vcellinp__mux__channels = 0;
     // Body
-    vlSelfRef.generic_fifo__DOT__aclk = vlSelfRef.aclk;
-    vlSelfRef.generic_fifo__DOT__resetn = vlSelfRef.resetn;
-    vlSelfRef.generic_fifo__DOT__data_in[0U] = vlSelfRef.data_in[0U];
-    vlSelfRef.generic_fifo__DOT__data_in[1U] = vlSelfRef.data_in[1U];
-    vlSelfRef.generic_fifo__DOT__data_in[2U] = vlSelfRef.data_in[2U];
-    vlSelfRef.generic_fifo__DOT__push = vlSelfRef.push;
-    vlSelfRef.generic_fifo__DOT__pop = vlSelfRef.pop;
-    vlSelfRef.rd_ptr = vlSelfRef.generic_fifo__DOT__rd_ptr;
-    vlSelfRef.wr_ptr = vlSelfRef.generic_fifo__DOT__wr_ptr;
-    vlSelfRef.data_out[0U] = vlSelfRef.generic_fifo__DOT__data_out[0U];
-    vlSelfRef.data_out[1U] = vlSelfRef.generic_fifo__DOT__data_out[1U];
-    vlSelfRef.data_out[2U] = vlSelfRef.generic_fifo__DOT__data_out[2U];
-    vlSelfRef.generic_fifo__DOT__empty = (0U == (IData)(vlSelfRef.generic_fifo__DOT__count));
-    vlSelfRef.generic_fifo__DOT__full = (1U & ((IData)(vlSelfRef.generic_fifo__DOT__count) 
-                                               >> 1U));
-    vlSelfRef.empty = vlSelfRef.generic_fifo__DOT__empty;
-    vlSelfRef.full = vlSelfRef.generic_fifo__DOT__full;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__unsigned_ = 
+        (1U & ((IData)(vlSelfRef.op) >> 0U));
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__B 
+        = (0xfU & (~ (IData)(vlSelfRef.b)));
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__add__DOT__ci 
+        = (1U & ((IData)(vlSelfRef.a) >> 3U));
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__add__DOT__A 
+        = (0xfU & (~ (IData)(vlSelfRef.a)));
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__mux__DOT__select 
+        = (1U & ((IData)(vlSelfRef.a) >> 3U));
+    vlSelfRef.ALU_RV32I__DOT__a_signed_for_shift_right_arithmetic 
+        = vlSelfRef.a;
+    vlSelfRef.ALU_RV32I__DOT__op = vlSelfRef.op;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__op = (1U 
+                                                  & ((IData)(vlSelfRef.op) 
+                                                     >> 0U));
+    vlSelfRef.ALU_RV32I__DOT__b = vlSelfRef.b;
+    vlSelfRef.ALU_RV32I__DOT__a = vlSelfRef.a;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__O 
+        = (0xfU & ((IData)(1U) + ((~ (IData)(vlSelfRef.b)) 
+                                  + (IData)(vlSelfRef.a))));
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__co 
+        = (1U & (((IData)(1U) + ((IData)(vlSelfRef.a) 
+                                 + (0xfU & (~ (IData)(vlSelfRef.b))))) 
+                 >> 4U));
+    if ((1U & (IData)(vlSelfRef.op))) {
+        vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b_a1 
+            = (0xfU & (~ (IData)(vlSelfRef.b)));
+        vlSelfRef.ALU_RV32I__DOT__slt__DOT__o_aux = 
+            (1U & (~ (IData)(vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__co)));
+    } else {
+        vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b_a1 
+            = (0xfU & (IData)(vlSelfRef.b));
+        vlSelfRef.ALU_RV32I__DOT__slt__DOT__o_aux = 
+            (1U & (((~ ((IData)(vlSelfRef.b) >> 3U)) 
+                    & ((IData)(vlSelfRef.a) >> 3U)) 
+                   | ((~ (((IData)(vlSelfRef.a) | (IData)(vlSelfRef.b)) 
+                          >> 3U)) & ((IData)(vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__O) 
+                                     >> 3U))));
+    }
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__adder_o = (0xfU 
+                                                   & (VL_SHIFTR_III(4,4,32, (IData)(vlSelfRef.a), 3U) 
+                                                      + 
+                                                      (~ (IData)(vlSelfRef.a))));
+    vlSelfRef.ALU_RV32I__DOT__mux__DOT__select = vlSelfRef.ALU_RV32I__DOT__op;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__a1__DOT__on 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__op;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__adder__DOT__ci 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__op;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__b = vlSelfRef.ALU_RV32I__DOT__b;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b = vlSelfRef.ALU_RV32I__DOT__b;
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__A = vlSelfRef.ALU_RV32I__DOT__a;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__a = vlSelfRef.ALU_RV32I__DOT__a;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__a = vlSelfRef.ALU_RV32I__DOT__a;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder_o = vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__O;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__co = vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__co;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__adder__DOT__B 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b_a1;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__a1__DOT__a1 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b_a1;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__o = (0xfU 
+                                                 & ((1U 
+                                                     & (IData)(vlSelfRef.op)) 
+                                                    + 
+                                                    ((IData)(vlSelfRef.a) 
+                                                     + (IData)(vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b_a1))));
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__add__DOT__O 
+        = vlSelfRef.ALU_RV32I__DOT__abs__DOT__adder_o;
+    ALU_RV32I__DOT__abs__DOT____Vcellinp__mux__channels 
+        = (((IData)(vlSelfRef.ALU_RV32I__DOT__abs__DOT__adder_o) 
+            << 4U) | (IData)(vlSelfRef.a));
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__a1__DOT__a 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__b;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__adder__DOT__A 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__a;
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__adder__DOT__A 
+        = vlSelfRef.ALU_RV32I__DOT__slt__DOT__a;
+    vlSelfRef.ALU_RV32I__DOT__slt_o = vlSelfRef.ALU_RV32I__DOT__slt__DOT__o_aux;
+    vlSelfRef.ALU_RV32I__DOT__add_sub_o = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__o;
+    vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__adder__DOT__O 
+        = vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__o;
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__mux__DOT__channels 
+        = ALU_RV32I__DOT__abs__DOT____Vcellinp__mux__channels;
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__abs_A = (0xfU 
+                                                 & ((IData)(ALU_RV32I__DOT__abs__DOT____Vcellinp__mux__channels) 
+                                                    >> 
+                                                    (7U 
+                                                     & VL_SHIFTL_III(3,3,32, 
+                                                                     (1U 
+                                                                      & ((IData)(vlSelfRef.a) 
+                                                                         >> 3U)), 2U))));
+    vlSelfRef.ALU_RV32I__DOT__slt__DOT__o = vlSelfRef.ALU_RV32I__DOT__slt_o;
+    vlSelfRef.ALU_RV32I__DOT__abs_o = vlSelfRef.ALU_RV32I__DOT__abs__DOT__abs_A;
+    vlSelfRef.ALU_RV32I__DOT__abs__DOT__mux__DOT__channel_out 
+        = vlSelfRef.ALU_RV32I__DOT__abs__DOT__abs_A;
+    ALU_RV32I__DOT____Vcellinp__mux__channels = (((QData)((IData)(
+                                                                  (0xfU 
+                                                                   & VL_MODDIV_III(4, (IData)(vlSelfRef.a), (IData)(vlSelfRef.b))))) 
+                                                  << 0x3cU) 
+                                                 | (((QData)((IData)(
+                                                                     (0xfU 
+                                                                      & VL_DIV_III(4, (IData)(vlSelfRef.a), (IData)(vlSelfRef.b))))) 
+                                                     << 0x38U) 
+                                                    | (((QData)((IData)(
+                                                                        (0xfU 
+                                                                         & ((IData)(vlSelfRef.a) 
+                                                                            * (IData)(vlSelfRef.b))))) 
+                                                        << 0x34U) 
+                                                       | (((QData)((IData)(vlSelfRef.ALU_RV32I__DOT__abs__DOT__abs_A)) 
+                                                           << 0x30U) 
+                                                          | (((QData)((IData)(vlSelfRef.b)) 
+                                                              << 0x2cU) 
+                                                             | (((QData)((IData)(vlSelfRef.a)) 
+                                                                 << 0x28U) 
+                                                                | (((QData)((IData)(
+                                                                                (0xffU 
+                                                                                & (((IData)(vlSelfRef.ALU_RV32I__DOT__slt_o) 
+                                                                                << 4U) 
+                                                                                | (IData)(vlSelfRef.ALU_RV32I__DOT__slt_o))))) 
+                                                                    << 0x20U) 
+                                                                   | (QData)((IData)(
+                                                                                ((VL_SHIFTRS_III(4,4,4, (IData)(vlSelfRef.a), (IData)(vlSelfRef.b)) 
+                                                                                << 0x1cU) 
+                                                                                | ((0xf000000U 
+                                                                                & (((IData)(vlSelfRef.a) 
+                                                                                >> (IData)(vlSelfRef.b)) 
+                                                                                << 0x18U)) 
+                                                                                | ((0xf00000U 
+                                                                                & (((IData)(vlSelfRef.a) 
+                                                                                << (IData)(vlSelfRef.b)) 
+                                                                                << 0x14U)) 
+                                                                                | ((((IData)(vlSelfRef.a) 
+                                                                                & (IData)(vlSelfRef.b)) 
+                                                                                << 0x10U) 
+                                                                                | ((((IData)(vlSelfRef.a) 
+                                                                                | (IData)(vlSelfRef.b)) 
+                                                                                << 0xcU) 
+                                                                                | ((((IData)(vlSelfRef.a) 
+                                                                                ^ (IData)(vlSelfRef.b)) 
+                                                                                << 8U) 
+                                                                                | (0xffU 
+                                                                                & (((IData)(vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__o) 
+                                                                                << 4U) 
+                                                                                | (IData)(vlSelfRef.ALU_RV32I__DOT__add_sub__DOT__o))))))))))))))))));
+    vlSelfRef.ALU_RV32I__DOT__mux__DOT__channels = ALU_RV32I__DOT____Vcellinp__mux__channels;
+    vlSelfRef.ALU_RV32I__DOT__o = (0xfU & (IData)((ALU_RV32I__DOT____Vcellinp__mux__channels 
+                                                   >> 
+                                                   (0x3fU 
+                                                    & VL_SHIFTL_III(6,6,32, (IData)(vlSelfRef.op), 2U)))));
+    vlSelfRef.o = vlSelfRef.ALU_RV32I__DOT__o;
+    vlSelfRef.ALU_RV32I__DOT__mux__DOT__channel_out 
+        = vlSelfRef.ALU_RV32I__DOT__o;
 }
 
 void Vtop___024root___eval_triggers__ico(Vtop___024root* vlSelf);
@@ -68,136 +208,11 @@ void Vtop___024root___eval_act(Vtop___024root* vlSelf) {
     auto &vlSelfRef = std::ref(*vlSelf).get();
 }
 
-void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf);
-
 void Vtop___024root___eval_nba(Vtop___024root* vlSelf) {
     (void)vlSelf;  // Prevent unused variable warning
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_nba\n"); );
     auto &vlSelfRef = std::ref(*vlSelf).get();
-    // Body
-    if ((1ULL & vlSelfRef.__VnbaTriggered.word(0U))) {
-        Vtop___024root___nba_sequent__TOP__0(vlSelf);
-    }
-}
-
-VL_INLINE_OPT void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
-    (void)vlSelf;  // Prevent unused variable warning
-    Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___nba_sequent__TOP__0\n"); );
-    auto &vlSelfRef = std::ref(*vlSelf).get();
-    // Init
-    CData/*0:0*/ __Vdly__generic_fifo__DOT__rd_ptr;
-    __Vdly__generic_fifo__DOT__rd_ptr = 0;
-    CData/*0:0*/ __Vdly__generic_fifo__DOT__wr_ptr;
-    __Vdly__generic_fifo__DOT__wr_ptr = 0;
-    VlWide<3>/*83:0*/ __VdlyVal__generic_fifo__DOT__mem__v0;
-    VL_ZERO_W(84, __VdlyVal__generic_fifo__DOT__mem__v0);
-    CData/*0:0*/ __VdlyDim0__generic_fifo__DOT__mem__v0;
-    __VdlyDim0__generic_fifo__DOT__mem__v0 = 0;
-    CData/*1:0*/ __Vdly__generic_fifo__DOT__count;
-    __Vdly__generic_fifo__DOT__count = 0;
-    CData/*0:0*/ __VdlySet__generic_fifo__DOT__mem__v0;
-    __VdlySet__generic_fifo__DOT__mem__v0 = 0;
-    CData/*0:0*/ __VdlySet__generic_fifo__DOT__mem__v1;
-    __VdlySet__generic_fifo__DOT__mem__v1 = 0;
-    // Body
-    __Vdly__generic_fifo__DOT__rd_ptr = vlSelfRef.generic_fifo__DOT__rd_ptr;
-    __Vdly__generic_fifo__DOT__wr_ptr = vlSelfRef.generic_fifo__DOT__wr_ptr;
-    __VdlySet__generic_fifo__DOT__mem__v0 = 0U;
-    __VdlySet__generic_fifo__DOT__mem__v1 = 0U;
-    __Vdly__generic_fifo__DOT__count = vlSelfRef.generic_fifo__DOT__count;
-    if ((1U & (~ (IData)(vlSelfRef.resetn)))) {
-        vlSelfRef.generic_fifo__DOT__unnamedblk1__DOT__i = 1U;
-    }
-    if (vlSelfRef.resetn) {
-        if (((~ (IData)(vlSelfRef.generic_fifo__DOT__full)) 
-             & (IData)(vlSelfRef.push))) {
-            __Vdly__generic_fifo__DOT__wr_ptr = (1U 
-                                                 & ((IData)(1U) 
-                                                    + (IData)(vlSelfRef.generic_fifo__DOT__wr_ptr)));
-            __VdlyVal__generic_fifo__DOT__mem__v0[0U] 
-                = vlSelfRef.data_in[0U];
-            __VdlyVal__generic_fifo__DOT__mem__v0[1U] 
-                = vlSelfRef.data_in[1U];
-            __VdlyVal__generic_fifo__DOT__mem__v0[2U] 
-                = vlSelfRef.data_in[2U];
-            __VdlyDim0__generic_fifo__DOT__mem__v0 
-                = vlSelfRef.generic_fifo__DOT__wr_ptr;
-            __VdlySet__generic_fifo__DOT__mem__v0 = 1U;
-            __Vdly__generic_fifo__DOT__count = (3U 
-                                                & ((IData)(1U) 
-                                                   + (IData)(vlSelfRef.generic_fifo__DOT__count)));
-        }
-        if (((~ (IData)(vlSelfRef.generic_fifo__DOT__empty)) 
-             & (IData)(vlSelfRef.pop))) {
-            __Vdly__generic_fifo__DOT__count = (3U 
-                                                & ((IData)(vlSelfRef.generic_fifo__DOT__count) 
-                                                   - (IData)(1U)));
-            __Vdly__generic_fifo__DOT__rd_ptr = (1U 
-                                                 & ((IData)(1U) 
-                                                    + (IData)(vlSelfRef.generic_fifo__DOT__rd_ptr)));
-            vlSelfRef.generic_fifo__DOT__data_out[0U] 
-                = vlSelfRef.generic_fifo__DOT__mem[vlSelfRef.generic_fifo__DOT__rd_ptr][0U];
-            vlSelfRef.generic_fifo__DOT__data_out[1U] 
-                = vlSelfRef.generic_fifo__DOT__mem[vlSelfRef.generic_fifo__DOT__rd_ptr][1U];
-            vlSelfRef.generic_fifo__DOT__data_out[2U] 
-                = vlSelfRef.generic_fifo__DOT__mem[vlSelfRef.generic_fifo__DOT__rd_ptr][2U];
-        }
-    } else {
-        __Vdly__generic_fifo__DOT__wr_ptr = 0U;
-        __VdlySet__generic_fifo__DOT__mem__v1 = 1U;
-        __Vdly__generic_fifo__DOT__count = 0U;
-        vlSelfRef.generic_fifo__DOT__mem[0U][2U] = 
-            (0xff0ffU & vlSelfRef.generic_fifo__DOT__mem
-             [0U][2U]);
-        __Vdly__generic_fifo__DOT__rd_ptr = 0U;
-        vlSelfRef.generic_fifo__DOT__mem[0U][0U] = 
-            (0xffU & vlSelfRef.generic_fifo__DOT__mem
-             [0U][0U]);
-        vlSelfRef.generic_fifo__DOT__mem[0U][1U] = 0xffffff00U;
-        vlSelfRef.generic_fifo__DOT__mem[0U][2U] = 
-            (0xffU | (0xfff00U & vlSelfRef.generic_fifo__DOT__mem
-                      [0U][2U]));
-        vlSelfRef.generic_fifo__DOT__mem[0U][0U] = 
-            (0xffffff0fU & vlSelfRef.generic_fifo__DOT__mem
-             [0U][0U]);
-        vlSelfRef.generic_fifo__DOT__mem[0U][0U] = 
-            (1U | (0xfffffff0U & vlSelfRef.generic_fifo__DOT__mem
-                   [0U][0U]));
-        vlSelfRef.generic_fifo__DOT__data_out[0U] = 
-            vlSelfRef.generic_fifo__DOT__mem[0U][0U];
-        vlSelfRef.generic_fifo__DOT__data_out[1U] = 
-            vlSelfRef.generic_fifo__DOT__mem[0U][1U];
-        vlSelfRef.generic_fifo__DOT__data_out[2U] = 
-            vlSelfRef.generic_fifo__DOT__mem[0U][2U];
-    }
-    vlSelfRef.generic_fifo__DOT__wr_ptr = __Vdly__generic_fifo__DOT__wr_ptr;
-    vlSelfRef.generic_fifo__DOT__count = __Vdly__generic_fifo__DOT__count;
-    vlSelfRef.generic_fifo__DOT__rd_ptr = __Vdly__generic_fifo__DOT__rd_ptr;
-    if (__VdlySet__generic_fifo__DOT__mem__v0) {
-        vlSelfRef.generic_fifo__DOT__mem[__VdlyDim0__generic_fifo__DOT__mem__v0][0U] 
-            = __VdlyVal__generic_fifo__DOT__mem__v0[0U];
-        vlSelfRef.generic_fifo__DOT__mem[__VdlyDim0__generic_fifo__DOT__mem__v0][1U] 
-            = __VdlyVal__generic_fifo__DOT__mem__v0[1U];
-        vlSelfRef.generic_fifo__DOT__mem[__VdlyDim0__generic_fifo__DOT__mem__v0][2U] 
-            = __VdlyVal__generic_fifo__DOT__mem__v0[2U];
-    }
-    if (__VdlySet__generic_fifo__DOT__mem__v1) {
-        vlSelfRef.generic_fifo__DOT__mem[0U][2U] = 
-            (0xfffU & vlSelfRef.generic_fifo__DOT__mem
-             [0U][2U]);
-    }
-    vlSelfRef.wr_ptr = vlSelfRef.generic_fifo__DOT__wr_ptr;
-    vlSelfRef.generic_fifo__DOT__empty = (0U == (IData)(vlSelfRef.generic_fifo__DOT__count));
-    vlSelfRef.generic_fifo__DOT__full = (1U & ((IData)(vlSelfRef.generic_fifo__DOT__count) 
-                                               >> 1U));
-    vlSelfRef.rd_ptr = vlSelfRef.generic_fifo__DOT__rd_ptr;
-    vlSelfRef.data_out[0U] = vlSelfRef.generic_fifo__DOT__data_out[0U];
-    vlSelfRef.data_out[1U] = vlSelfRef.generic_fifo__DOT__data_out[1U];
-    vlSelfRef.data_out[2U] = vlSelfRef.generic_fifo__DOT__data_out[2U];
-    vlSelfRef.empty = vlSelfRef.generic_fifo__DOT__empty;
-    vlSelfRef.full = vlSelfRef.generic_fifo__DOT__full;
 }
 
 void Vtop___024root___eval_triggers__act(Vtop___024root* vlSelf);
@@ -208,7 +223,7 @@ bool Vtop___024root___eval_phase__act(Vtop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_phase__act\n"); );
     auto &vlSelfRef = std::ref(*vlSelf).get();
     // Init
-    VlTriggerVec<1> __VpreTriggered;
+    VlTriggerVec<0> __VpreTriggered;
     CData/*0:0*/ __VactExecute;
     // Body
     Vtop___024root___eval_triggers__act(vlSelf);
@@ -266,7 +281,7 @@ void Vtop___024root___eval(Vtop___024root* vlSelf) {
 #ifdef VL_DEBUG
             Vtop___024root___dump_triggers__ico(vlSelf);
 #endif
-            VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/modules/generic_fifo.sv", 4, "", "Input combinational region did not converge.");
+            VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv", 1, "", "Input combinational region did not converge.");
         }
         __VicoIterCount = ((IData)(1U) + __VicoIterCount);
         __VicoContinue = 0U;
@@ -282,7 +297,7 @@ void Vtop___024root___eval(Vtop___024root* vlSelf) {
 #ifdef VL_DEBUG
             Vtop___024root___dump_triggers__nba(vlSelf);
 #endif
-            VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/modules/generic_fifo.sv", 4, "", "NBA region did not converge.");
+            VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv", 1, "", "NBA region did not converge.");
         }
         __VnbaIterCount = ((IData)(1U) + __VnbaIterCount);
         __VnbaContinue = 0U;
@@ -293,7 +308,7 @@ void Vtop___024root___eval(Vtop___024root* vlSelf) {
 #ifdef VL_DEBUG
                 Vtop___024root___dump_triggers__act(vlSelf);
 #endif
-                VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/modules/generic_fifo.sv", 4, "", "Active region did not converge.");
+                VL_FATAL_MT("/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv", 1, "", "Active region did not converge.");
             }
             vlSelfRef.__VactIterCount = ((IData)(1U) 
                                          + vlSelfRef.__VactIterCount);
@@ -315,13 +330,11 @@ void Vtop___024root___eval_debug_assertions(Vtop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_debug_assertions\n"); );
     auto &vlSelfRef = std::ref(*vlSelf).get();
     // Body
-    if (VL_UNLIKELY((vlSelfRef.aclk & 0xfeU))) {
-        Verilated::overWidthError("aclk");}
-    if (VL_UNLIKELY((vlSelfRef.resetn & 0xfeU))) {
-        Verilated::overWidthError("resetn");}
-    if (VL_UNLIKELY((vlSelfRef.push & 0xfeU))) {
-        Verilated::overWidthError("push");}
-    if (VL_UNLIKELY((vlSelfRef.pop & 0xfeU))) {
-        Verilated::overWidthError("pop");}
+    if (VL_UNLIKELY((vlSelfRef.op & 0xf0U))) {
+        Verilated::overWidthError("op");}
+    if (VL_UNLIKELY((vlSelfRef.a & 0xf0U))) {
+        Verilated::overWidthError("a");}
+    if (VL_UNLIKELY((vlSelfRef.b & 0xf0U))) {
+        Verilated::overWidthError("b");}
 }
 #endif  // VL_DEBUG
