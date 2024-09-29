@@ -35,7 +35,7 @@ async def tb_ALU_RV32I(dut):
     await Timer(100, units='ns')
 
     # Some expected values
-    expected_values = [0, 2, 4, 6, 8, 10, 12, 14]
+    expected_values = [0, 1, 2, 3, 4, 5, 6, 7]
     len_expected_values = len(expected_values)
 
 

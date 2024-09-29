@@ -31,9 +31,11 @@ verilog_sources_and_include_dirs:
 
 # Simulator to be used for the simulation. Options are 'verilator' or 'questa'.
 simulator: verilator
+# simulator: questa
 
 # Time scale and precision for the simulation (1ns for time, 1ps for precision).
-timescale_timeprecision: 1ns/1ps
+# timescale_timeprecision: 1ns/1ps
+timescale_timeprecision: 10ns/10ps
 
 # Name of the DUT (Device Under Test), which is the Verilog module being tested (do not use the extention).
 DUT_name: ALU_RV32I

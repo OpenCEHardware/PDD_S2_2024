@@ -33,22 +33,22 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
         // Check resources
         Verilated::stackCheck(97);
     // Configure time unit / time precision
-    _vm_contextp__->timeunit(-9);
-    _vm_contextp__->timeprecision(-12);
+    _vm_contextp__->timeunit(-8);
+    _vm_contextp__->timeprecision(-11);
     // Setup each module's pointers to their submodules
     // Setup each module's pointer back to symbol table (for public functions)
     TOP.__Vconfigure(true);
     // Setup scopes
-    __Vscope_ALU_RV32I.configure(this, name(), "ALU_RV32I", "ALU_RV32I", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__abs.configure(this, name(), "ALU_RV32I.abs", "abs", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__abs__add.configure(this, name(), "ALU_RV32I.abs.add", "add", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__abs__mux.configure(this, name(), "ALU_RV32I.abs.mux", "mux", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__add_sub.configure(this, name(), "ALU_RV32I.add_sub", "add_sub", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__add_sub__a1.configure(this, name(), "ALU_RV32I.add_sub.a1", "a1", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__add_sub__adder.configure(this, name(), "ALU_RV32I.add_sub.adder", "adder", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__mux.configure(this, name(), "ALU_RV32I.mux", "mux", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__slt.configure(this, name(), "ALU_RV32I.slt", "slt", -9, VerilatedScope::SCOPE_MODULE);
-    __Vscope_ALU_RV32I__slt__adder.configure(this, name(), "ALU_RV32I.slt.adder", "adder", -9, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I.configure(this, name(), "ALU_RV32I", "ALU_RV32I", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__abs.configure(this, name(), "ALU_RV32I.abs", "abs", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__abs__add.configure(this, name(), "ALU_RV32I.abs.add", "add", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__abs__mux.configure(this, name(), "ALU_RV32I.abs.mux", "mux", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__add_sub.configure(this, name(), "ALU_RV32I.add_sub", "add_sub", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__add_sub__a1.configure(this, name(), "ALU_RV32I.add_sub.a1", "a1", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__add_sub__adder.configure(this, name(), "ALU_RV32I.add_sub.adder", "adder", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__mux.configure(this, name(), "ALU_RV32I.mux", "mux", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__slt.configure(this, name(), "ALU_RV32I.slt", "slt", -8, VerilatedScope::SCOPE_MODULE);
+    __Vscope_ALU_RV32I__slt__adder.configure(this, name(), "ALU_RV32I.slt.adder", "adder", -8, VerilatedScope::SCOPE_MODULE);
     __Vscope_TOP.configure(this, name(), "TOP", "TOP", 0, VerilatedScope::SCOPE_OTHER);
 
     // Set up scope hierarchy

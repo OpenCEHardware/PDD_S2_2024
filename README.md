@@ -20,9 +20,29 @@ Make sure the following dependencies are installed:
 
 - Python 3.x
 - cocotb
-- Verilator or Questa (depending on your needs)
+- Verilator and/or Questa (depending on your needs)
 - A working C++ compiler for Verilator
 - Ensure that [WSL (Windows Subsystem for Linux)] is installed if you are running the tool on Windows.
+- Set script policy to 'Bypass'
+
+#### For windows
+##### Setting script policy in PowerShell
+```
+Set-ExecutionPolicy -ExecutionPolicy Bypass
+```
+
+##### For Questa Intel FPGA Starter Edition used in Windows WSL
+Make sure your WSL mac address is always the same that the one in the license.dat. For this set the variable 'wantmac' in /root/.bashrc by adding.
+
+```
+wantmac=xx:xx:xx:xx:xx:xx
+mac=$(ip link show eth0 | awk '/ether/ {print $2}')
+if [[ $mac !=  $wantmac ]]; then
+    sudo ip link set dev eth0 down
+    sudo ip link set dev eth0 address $wantmac
+    sudo ip link set dev eth0 up
+fi
+```
 
 ### 2. Installation
 
@@ -39,3 +59,5 @@ pip install -r requirements.txt
 1. Open PowerShell in the `src` directory.
 2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
 3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
+4. The flag ```-c``` compiles the code for the current sim.
+5. The flag ```--run-make``` runs the current template.

@@ -15,7 +15,10 @@ g_os_name = OS.WINDOWS.value
 g_TEMPLATE_OPTION_0 = '..\\templates\\arch_simple.txt'
 g_TEMPLATE_OPTION_1 = '..\\templates\\arch_structured.txt'
 g_TEMPLATE_STRUCTURE_OPTION_0 = '..\\templates\\structure_example_1.txt'
+g_TEST_PATH = "test"
 g_SIM_BUILD_PATH = "test\\sim_build"
+g_QUESTA_BIN_PATH = "/root/intelFPGA_pro/23.1/questa_fse/bin"
+
 
 def recognize_os():
     global g_os_name
@@ -28,11 +31,12 @@ def recognize_os():
 
 
 def covert_template_paths():
-    global g_TEMPLATE_OPTION_0, g_TEMPLATE_OPTION_1, g_TEMPLATE_STRUCTURE_OPTION_0, g_SIM_BUILD_PATH
+    global g_TEMPLATE_OPTION_0, g_TEMPLATE_OPTION_1, g_TEMPLATE_STRUCTURE_OPTION_0, g_TEST_PATH, g_SIM_BUILD_PATH
     if(g_os_name == OS.UBUNTU.value):
         g_TEMPLATE_OPTION_0 = windows_to_unix_path(g_TEMPLATE_OPTION_0)
         g_TEMPLATE_OPTION_1 = windows_to_unix_path(g_TEMPLATE_OPTION_1)
         g_TEMPLATE_STRUCTURE_OPTION_0 = windows_to_unix_path(g_TEMPLATE_STRUCTURE_OPTION_0)
+        g_TEST_PATH = windows_to_unix_path(g_TEST_PATH)
         g_SIM_BUILD_PATH = windows_to_unix_path(g_SIM_BUILD_PATH)
 
 def covert_metadata_path(path):

@@ -142,7 +142,7 @@ def get_handle_resets_section(metadata: yr.Metadata) -> str:
     return template_section
 
 
-def generate_jinja_template(metadata: yr.Metadata, template_option=0) -> str:
+def generate_jinja_template(metadata: yr.Metadata, template_option) -> str:
     has_clocks_ = has_clocks(metadata)
     has_resets_ = has_resets(metadata)
     has_inputs_ = has_inputs(metadata)
