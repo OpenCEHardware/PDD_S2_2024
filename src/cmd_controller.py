@@ -35,9 +35,11 @@ def check_wsl_installed():
     Raises:
         subprocess.CalledProcessError: If there is an error executing the `wsl` command.
     """
+
     has_WSL = False
     try:
         result = subprocess.run(["wsl", "--list"], capture_output=True, text=True, check=True)
+
         if NO_WSL_MSG_ERR_STR in result.stderr:
             print("WSL is not enabled on your system.")
         else:
@@ -144,9 +146,9 @@ def cmd_parser():
         help="Filepath of the yaml config file."
     )
     parser.add_argument(
-        "--run-make",
+        "-r",
         action="store_true",
-        help="Run make without overwriting template and makefile."
+        help="Run make without overwriting template."
     )
     parser.add_argument(
         "-c",
@@ -166,7 +168,7 @@ def cmd_parser():
 
     # set globals values
     g_yaml_path = args.yaml_filepath
-    g_run_make = args.run_make
+    g_run_make = args.r
     g_compile = args.c
 
 if __name__ == "__main__":
@@ -177,7 +179,14 @@ if __name__ == "__main__":
         print("Use just 1 flag")
 
     else:
-        metadata = yr.read_yaml(g_yaml_path) # <- gens test folder
+        metadata = yr.read_yaml(g_yaml_path) # <- gens output folder folder
+
+        U.g_TEST_PATH = metadata.output_dir
+        U.g_SIM_BUILD_PATH = metadata.output_dir + U.g_SIM_BUILD_PATH
+        # print(f"U.g_TEST_PATH: {U.g_TEST_PATH}")
+        # print(f"U.g_SIM_BUILD_PATH: {U.g_SIM_BUILD_PATH}")
+
+        U.covert_template_paths()
 
         is_sim_build_a_dir = Path(U.g_SIM_BUILD_PATH).is_dir()
         is_sim_build_empty = True
@@ -190,9 +199,10 @@ if __name__ == "__main__":
             U.print_dash_line()
             print("Using current template")
 
-        mg.gen_makefile(metadata)
+        is_output_dir_empty = U.is_directory_empty(U.g_TEST_PATH)
+        if not is_output_dir_empty:
+            mg.gen_makefile(metadata)
 
-        is_test_empty = U.is_directory_empty(U.g_TEST_PATH)
 
         if(U.g_os_name == U.OS.WINDOWS.value):
             has_wsl = check_wsl_installed()
@@ -202,9 +212,9 @@ if __name__ == "__main__":
                 if(not is_sim_build_a_dir and g_compile):
                     print("Compiling")
                     exec_WSL(dir=metadata.output_dir, show_stderr=False, show_exit_code=False)
-                elif(not is_sim_build_a_dir and not g_compile and is_test_empty):
+                elif(not is_sim_build_a_dir and not g_compile and is_output_dir_empty):
                     print("There is no template")
-                elif(not is_sim_build_a_dir and not g_compile and not is_test_empty):
+                elif(not is_sim_build_a_dir and not g_compile and not is_output_dir_empty):
                     print("Compiling and running")
                     exec_WSL(dir=metadata.output_dir, show_stdout=False, show_stderr=False, show_exit_code=False)
                     exec_WSL(dir=metadata.output_dir)

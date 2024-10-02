@@ -1,8 +1,10 @@
 # Autococo (Automatic cocotb based hardware testbench generator tool)
 
+
 ## Overview
 
 This tool automates the creation of testbenches for hardware modules written in SystemVerilog (`.sv`), using cocotb as the test framework. It supports running simulations using **Verilator** or **Questa**, generating the necessary cocotb template and Makefile. The tool simplifies the testing workflow by automatically configuring the simulator, handling testbench creation, and managing file paths.
+
 
 ## Features
 
@@ -11,6 +13,7 @@ This tool automates the creation of testbenches for hardware modules written in 
 - **Customizable Inputs and Outputs**: You can specify the inputs, outputs, clocks, and resets of the DUT (Device Under Test) through the YAML configuration.
 - **Makefile Generation**: Creates a Makefile that runs the cocotb testbench with the selected simulator.
 - **Cross-Platform Support**: Works on both Linux (Ubuntu) and Windows environments.
+
 
 ## Setup
 
@@ -24,6 +27,7 @@ Make sure the following dependencies are installed:
 - A working C++ compiler for Verilator
 - Ensure that [WSL (Windows Subsystem for Linux)] is installed if you are running the tool on Windows.
 - Set script policy to 'Bypass'
+
 
 #### For windows
 ##### Setting script policy in PowerShell
@@ -44,6 +48,7 @@ if [[ $mac !=  $wantmac ]]; then
 fi
 ```
 
+
 ### 2. Installation
 
 Clone the repository and install the required Python packages.
@@ -54,10 +59,17 @@ cd <your-repo-directory>
 pip install -r requirements.txt
 ```
 
+
 ## Usage
 
 1. Open PowerShell in the `src` directory.
 2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
 3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
-4. The flag ```-c``` compiles the code for the current sim.
-5. The flag ```--run-make``` runs the current template.
+4. The flag `-c` compiles the code for the current sim.
+5. The flag `-r` runs the current template.
+
+
+## Notes
+
+In verilator, input values not defined will be assumed as `0`.
+In Questa Intel FPGA Starter Edition, input values must be explicitly defined; otherwise, they will be assumed as `x`

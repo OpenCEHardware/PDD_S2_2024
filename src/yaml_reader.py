@@ -161,6 +161,7 @@ class Metadata:
         if not path.is_dir():
             path.mkdir(parents=True, exist_ok=True)
 
+
         for filepath in self.verilog_sources_specific_files:
             path = Path(filepath)
             if not path.is_file():

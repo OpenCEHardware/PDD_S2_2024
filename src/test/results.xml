@@ -1,6 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1727578776" />
-    <testcase name="tb_ALU_RV32I" classname="tb_ALU_RV32I" file="/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/test/tb_ALU_RV32I.py" lineno="32" time="0.0014119148254394531" sim_time_ns="180.01" ratio_time="127493.52634920634" />
+    <property name="random_seed" value="1727903469" />
+    <testcase name="tb_ALU_RV32I" classname="tbs" file="/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/test/tbs.py" lineno="32" time="0.030872106552124023" sim_time_ns="110.001" ratio_time="3563.1193425131482">
+      <failure message="Test failed with RANDOM_SEED=1727903469" />
+    </testcase>
   </testsuite>
 </testsuites>

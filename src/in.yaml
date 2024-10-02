@@ -10,16 +10,16 @@ output_dir: test
 template_type: structured
 
 # Module and dependencies
-# Section to define Verilog sources and their include directories.
+# Section to define Verilog sources and their include directories (use absolute paths).
 verilog_sources_and_include_dirs:
   # List of Verilog files to be used in the simulation.
   - verilog_sources:
     # Section to specify individual Verilog files.
-    - specific_files: # (Empty, files can be added here if needed)
+    - specific_files:
     
     # Directory to load all Verilog files from the specified paths.
     - load_all_from:
-      - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\ALU  # Absolute path to Verilog files.
+      - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\ALU
 
   # Include directories for Verilog files. These usually contain shared macros or definitions.
   - verilog_include_dirs:
@@ -27,21 +27,21 @@ verilog_sources_and_include_dirs:
     - specific_files: 
 
     # Directory to load all include files from the specified ptahs.
-    - load_all_from: # (Not defined, can be specified later)
+    - load_all_from:
 
 # Simulator to be used for the simulation. Options are 'verilator' or 'questa'.
-simulator: verilator
-# simulator: questa
+# simulator: verilator
+simulator: questa
 
 # Time scale and precision for the simulation (1ns for time, 1ps for precision).
 # timescale_timeprecision: 1ns/1ps
-timescale_timeprecision: 10ns/10ps
+timescale_timeprecision: 1ns/1ps
 
 # Name of the DUT (Device Under Test), which is the Verilog module being tested (do not use the extention).
 DUT_name: ALU_RV32I
 
 # Name of the testbench template to be used for the DUT (do not use the extention).
-template_name: tb_ALU_RV32I
+template_name: tbs
 
 # Definition of DUT inputs.
 DUT_inputs:

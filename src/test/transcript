@@ -1,0 +1,90 @@
+# do sim_build/runsim.do
+# Questa Intel Starter FPGA Edition-64 vmap 2022.4 Lib Mapping Utility 2022.10 Oct 18 2022
+# vmap -c 
+# ** Warning: vmap will not overwrite local modelsim.ini.
+# Questa Intel Starter FPGA Edition-64 vmap 2022.4 Lib Mapping Utility 2022.10 Oct 18 2022
+# vmap work sim_build/work 
+# Modifying modelsim.ini
+# Questa Intel Starter FPGA Edition-64 vlog 2022.4 Compiler 2022.10 Oct 18 2022
+# Start time: 15:11:07 on Oct 02,2024
+# vlog -work work "+define+COCOTB_SIM" -sv -timescale 1ns/1ps -mfcu "+acc" /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/A1_N.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Absolute_N.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Adder_Subtractor_N.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Adder_with_carries_N.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Adder_with_carry_in_N.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Multiplexer_MxN.sv /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/SLT_U_N.sv 
+# -- Compiling module A1_N
+# -- Compiling module Absolute_N
+# -- Compiling module Adder_Subtractor_N
+# -- Compiling module Adder_with_carries_N
+# -- Compiling module Adder_with_carry_in_N
+# -- Compiling module ALU_RV32I
+# -- Compiling module Multiplexer_MxN
+# ** Warning: /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Multiplexer_MxN.sv(6): (vlog-13314) Defaulting port 'channels' kind to 'var' rather than 'wire' due to default compile option setting of -svinputport=relaxed.
+# -- Compiling module SLT_U_N
+# 
+# Top level modules:
+# 	ALU_RV32I
+# End time: 15:11:07 on Oct 02,2024, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 1
+# vsim -onfinish exit -pli "/usr/local/lib/python3.10/dist-packages/cocotb/libs/libcocotbvpi_modelsim.so" sim_build/work.ALU_RV32I 
+# Start time: 15:11:07 on Oct 02,2024
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: (vsim-3865) Due to PLI being present, global +acc is being enabled automatically. This will cause your simulation to run very slowly. Please use vsim -no_autoacc to disable this feature. This feature is now deprecated and will be removed from future releases.
+# ** Warning: (vopt-10587) Some optimizations are turned off because the +acc switch is in effect. This will cause your simulation to run slowly. Please use -access/-debug to maintain needed visibility.
+# ** Warning: /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Multiplexer_MxN.sv(6): (vopt-13314) Defaulting port 'channels' kind to 'var' rather than 'wire' due to default compile option setting of -svinputport=relaxed.
+# ** Warning: /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/Multiplexer_MxN.sv(6): (vopt-13314) Defaulting port 'channels' kind to 'var' rather than 'wire' due to default compile option setting of -svinputport=relaxed.
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=4.
+# //  Questa Intel Starter FPGA Edition-64
+# //  Version 2022.4 linux_x86_64 Oct 18 2022
+# //
+# //  Copyright 1991-2022 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.ALU_RV32I(fast)
+# Loading work.Adder_Subtractor_N(fast)
+# Loading work.A1_N(fast)
+# Loading work.Adder_with_carry_in_N(fast)
+# Loading work.SLT_U_N(fast)
+# Loading work.Adder_with_carries_N(fast)
+# Loading work.Absolute_N(fast)
+# Loading work.Multiplexer_MxN(fast)
+# Loading work.Multiplexer_MxN(fast__1)
+# Loading /usr/local/lib/python3.10/dist-packages/cocotb/libs/libcocotbvpi_modelsim.so
+#      -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:79   in set_program_name_in_venv        Did not detect Python virtual environment. Using system-wide Python interpreter
+#      -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:101  in gpi_print_registered_impl       VPI registered
+#      0.00ns INFO     cocotb                             Running on ModelSim for QuestaIntel Starter FPGA Edition-64 version 2022.4 2022.10
+#      0.00ns INFO     cocotb                             Running tests with cocotb v1.9.0 from /usr/local/lib/python3.10/dist-packages/cocotb
+#      0.00ns INFO     cocotb                             Seeding Python random module with 1727903469
+#      0.00ns INFO     cocotb.regression                  Found test tbs.tb_ALU_RV32I
+#      0.00ns INFO     cocotb.regression                  running tb_ALU_RV32I (1/1)
+# ** Warning: (vsim-8630) Infinity results from division operation.
+#    Time: 0 ps  Iteration: 0  Process: /ALU_RV32I/#IMPLICIT-WIRE(a/b)#32 File: /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv Line: 32
+# ** Warning: (vsim-8630) Infinity results from division operation.
+#    Time: 100 ns  Iteration: 3  Process: /ALU_RV32I/#IMPLICIT-WIRE(a/b)#32 File: /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU/ALU_RV32I.sv Line: 32
+#    110.00ns INFO     cocotb.regression                  tb_ALU_RV32I failed
+#                                                         Traceback (most recent call last):
+#                                                           File "/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/test/tbs.py", line 57, in tb_ALU_RV32I
+#                                                             await checker(dut.o, expected_values)
+#                                                           File "/usr/local/lib/python3.10/dist-packages/cocotb/task.py", line 289, in __await__
+#                                                             return (yield self)
+#                                                           File "/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/test/tbs.py", line 83, in checker
+#                                                             assert observed == expected, f"Checker error: observed {observed}, expected {expected}"
+#                                                         AssertionError: Checker error: observed xxxx, expected 0
+#                                                         assert xxxx == 0
+#    110.00ns INFO     cocotb.regression                  **************************************************************************************
+#                                                         ** TEST                          STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+#                                                         **************************************************************************************
+#                                                         ** tbs.tb_ALU_RV32I               FAIL         110.00           0.03       3563.12  **
+#                                                         **************************************************************************************
+#                                                         ** TESTS=1 PASS=0 FAIL=1 SKIP=0                110.00           0.08       1370.77  **
+#                                                         **************************************************************************************
+#                                                         
+# ** Note: $finish
+#    Time: 110001 ps  Iteration: 0  Instance: /ALU_RV32I
+# End time: 15:11:09 on Oct 02,2024, Elapsed time: 0:00:02
+# Errors: 0, Warnings: 6
