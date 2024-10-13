@@ -21,12 +21,16 @@ This tool automates the creation of testbenches for hardware modules written in 
 
 Make sure the following dependencies are installed:
 
-- Python 3.x
-- cocotb
-- Verilator and/or Questa (depending on your needs)
-- A working C++ compiler for Verilator
-- Ensure that [WSL (Windows Subsystem for Linux)] is installed if you are running the tool on Windows.
-- Set script policy to 'Bypass'
+- **Python 3.x**
+- **PyYAML**: Install by running `pip install pyyaml`
+- **Jinja**: Install by running `pip install jinja2`
+- If you are running the tool on **Windows**, ensure that **WSL (Windows Subsystem for Linux)** is installed.
+
+In **WSL**, install:
+
+- **cocotb**: Run `pip install cocotb`
+- **Verilator** and/or **Questa**, depending on your needs.
+- A functional **C++** compiler for use with Verilator.
 
 
 #### For windows
@@ -34,6 +38,72 @@ Make sure the following dependencies are installed:
 ```
 Set-ExecutionPolicy -ExecutionPolicy Bypass
 ```
+
+
+
+
+#### For Ubuntu
+
+
+
+##### Install cocotb (1.9.1 or 1.9.0)
+`pip3 install cocotb`
+
+###### Verify Installation
+`pip3 show cocotb`
+
+###### Check if cocotb can be called
+`cocotb-config --version`
+
+###### If not working, add to PATH. Edit .bashrc with nano:
+`nano ~/.bashrc`
+
+###### Add the following line:
+export PATH=$PATH:/home/<user>/.local/bin
+
+###### Apply changes for .bashrc
+`source ~/.bashrc`
+
+
+##### Install Verilator (only 5.022 or higher)
+###### Install dependencies
+`sudo apt-get install git make autoconf g++ flex bison libfl-dev libgoogle-perftools-dev numactl perl python3`
+
+###### Install help2man
+`sudo apt-get install help2man`
+
+###### Clone Verilator
+```bash
+git clone https://github.com/verilator/verilator
+cd verilator
+git checkout v5.028
+```
+###### Configure and install Verilator
+```bash
+autoconf
+./configure
+make -j$(nproc)
+make test
+sudo make install
+```
+
+###### Verify Installation
+ls /usr/local/bin/verilator
+
+###### This will place it here:
+/usr/local/bin/verilator
+
+###### However, when calling it, it looks for it here:
+/usr/bin/verilator
+
+###### Add to PATH. Add the next line to .bashrc and then apply changes:
+export PATH=$PATH:/usr/local/bin
+
+###### Now verilator --version should work and show something like:
+Verilator 5.028 2024-08-21 rev v5.028
+
+
+
 
 ##### For Questa Intel FPGA Starter Edition used in Windows WSL
 Make sure your WSL mac address is always the same that the one in the license.dat. For this set the variable 'wantmac' in /root/.bashrc by adding.
