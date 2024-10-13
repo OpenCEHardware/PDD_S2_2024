@@ -16,7 +16,7 @@ g_TEMPLATE_OPTION_0 = '..\\templates\\arch_simple.txt'
 g_TEMPLATE_OPTION_1 = '..\\templates\\arch_structured.txt'
 g_TEMPLATE_STRUCTURE_OPTION_0 = '..\\templates\\structure_example_1.txt'
 g_TEST_PATH = ""
-g_SIM_BUILD_PATH = "\\sim_build"
+g_SIM_BUILD_PATH = "sim_build"
 g_QUESTA_BIN_PATH = "/root/intelFPGA_pro/23.1/questa_fse/bin"
 
 
@@ -27,6 +27,8 @@ def recognize_os():
     if current_os == 'posix':
         if platform.system() == "Linux" and "ubuntu" in platform.version().lower():
             g_os_name = OS.UBUNTU.value
+        else:
+            raise RuntimeError("Invalid platform")
 
 def covert_template_paths():
     global g_TEMPLATE_OPTION_0, g_TEMPLATE_OPTION_1, g_TEMPLATE_STRUCTURE_OPTION_0, g_TEST_PATH, g_SIM_BUILD_PATH

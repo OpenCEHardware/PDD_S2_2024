@@ -30,6 +30,8 @@ class Metadata:
 
     def __init__(self, yaml):
         self.yaml = yaml
+        # print(f"YAML: {self.yaml}, type: {type(self.yaml)}")
+
         dictionary = self.yaml
 
         key = self.Keys.OUTPUT_DIR.value
@@ -70,8 +72,8 @@ class Metadata:
                     self.verilog_include_dirs_specific_files = path_lists[1][0]
                     self.verilog_include_dirs_load_all_from = path_lists[1][1]
                     self.verify_paths()
-                    self.convert_paths()
-
+                    if(U.g_os_name != U.OS.UBUNTU.value):
+                        self.convert_paths()
 
 
         key = self.Keys.SIMULATOR.value
@@ -215,7 +217,10 @@ class Metadata:
     def display(self):
         print(f"Output Directory: {self.output_dir}, type: {type(self.output_dir)}")
         print(f"Template type: {self.template_type}, type: {type(self.template_type)}")
-        print(f"Verilog sources and include dirs: {self.VSAID}, type: {type(self.VSAID)}")
+        print(f"Verilog sources specific files: {self.verilog_sources_specific_files}, type: {type(self.verilog_sources_specific_files)}")
+        print(f"Verilog sources load all from: {self.verilog_sources_load_all_from}, type: {type(self.verilog_sources_load_all_from)}")
+        print(f"Verilog include dirs specific files: {self.verilog_include_dirs_specific_files}, type: {type(self.verilog_include_dirs_specific_files)}")
+        print(f"Verilog include dirs load all from: {self.verilog_include_dirs_load_all_from}, type: {type(self.verilog_include_dirs_load_all_from)}")
         print(f"Simulator: {self.simulator}, type: {type(self.simulator)}")
         print(f"Timescale: {self.timescale_magnitude}{self.timescale_unit}, type: {type(self.timescale_magnitude)} and {type(self.timescale_unit)}")
         print(f"Timeprecision: {self.timeprecision_magnitude}{self.timeprecision_unit}, type: {type(self.timeprecision_magnitude)} and {type(self.timeprecision_unit)}")

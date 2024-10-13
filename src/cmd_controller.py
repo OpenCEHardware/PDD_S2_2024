@@ -13,6 +13,7 @@ import Utils as U
 g_yaml_path = ''
 g_run_make = False
 g_compile = False
+g_src_dir = os.getcwd()
 
 COMMAND = "make"
 
@@ -77,47 +78,54 @@ def check_sv_file(file_path):
 #     return Path(path).is_dir()
 
 
-def exec_WSL(wsl_command=COMMAND, dir=None, show_stdout=True, show_stderr=True, show_exit_code=True):
-    # print(f"dir: {dir}")
-    actual_dir = os.getcwd()
-    # print(f"actual_dir: {actual_dir}")
-    # objetive_dir = os.path.join(actual_dir, dir)
-    # print(f"objetive_dir: {objetive_dir}")
-
+def general_exec(command=COMMAND, dir=None, show_stdout=True, show_stderr=True, show_exit_code=True):
     if show_stdout:
         U.print_dash_line('-')
-        print("Accessing WSL")
+        if(U.g_os_name == U.OS.WINDOWS.value):
+            print("Accessing WSL")
+        else:
+            print("Accessing Terminal")
 
     try:
-        objetive_dir = os.path.join(actual_dir, dir)
+        objetive_dir = os.path.join(g_src_dir, dir)
 
         if dir:
             if show_stdout:
                 print(f"Moving to dir: {objetive_dir}")
             os.chdir(objetive_dir)
 
-        if show_stdout:
-            print(f"Running: {wsl_command}")
+        if(U.g_os_name == U.OS.WINDOWS.value):
+            exec_powershell_wsl(command, show_stdout, show_stderr, show_exit_code)
+        else:
+            exec_terminal(command, show_stdout, show_stderr, show_exit_code)
 
-        exec_powershell_wsl(wsl_command, show_stdout, show_stderr, show_exit_code)
-
-        os.chdir(actual_dir)
+        os.chdir(g_src_dir)
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        # print(f"general_excec/Error: {e}")
+        pass
 
 def show_command_info(result, command, show_stdout, show_stderr, show_exit_code):
     U.print_dash_line('-')
-    print("WSL command executed:")
+    if(U.g_os_name == U.OS.WINDOWS.value):
+        print("WSL command executed:")
+    else:
+        print("Terminal command executed:")        
     print(command)
     U.print_dash_line('-')
 
     if show_stdout:
-        print("WSL stdout (output):")
+        if(U.g_os_name == U.OS.WINDOWS.value):
+            print("WSL stdout (output):")
+        else:
+            print("Terminal stdout (output):")
         print(result.stdout if result.stdout else "No stdout")
         U.print_dash_line('-')
 
     if show_stderr:
-        print("WSL stderr (errors):")
+        if(U.g_os_name == U.OS.WINDOWS.value):
+            print("WSL stderr (errors):")
+        else:
+            print("Terminal stderr (errors):")
         print(result.stderr if result.stderr else "No stderr")
         U.print_dash_line('-')
 
@@ -135,6 +143,12 @@ def exec_powershell_wsl(wsl_command, show_stdout, show_stderr, show_exit_code):
     powershell_command = f'wsl -e bash -ic "{wsl_command}"'
     result = subprocess.run(["powershell", "-Command", powershell_command], capture_output=True, text=True)
     show_command_info(result, powershell_command, show_stdout, show_stderr, show_exit_code)
+
+
+def exec_terminal(command, show_stdout, show_stderr, show_exit_code):
+    result = subprocess.run(command, check=True, text=True, capture_output=True)
+    show_command_info(result, command, show_stdout, show_stderr, show_exit_code)
+
 
 def cmd_parser():
     global g_yaml_path, g_run_make, g_compile
@@ -172,17 +186,16 @@ def cmd_parser():
     g_compile = args.c
 
 if __name__ == "__main__":
-    U.recognize_os()    
+    U.recognize_os()
     cmd_parser()
 
     if(g_compile and g_run_make):
-        print("Use just 1 flag")
-
+        raise RuntimeError("Use just 1 flag between -r and -c")
     else:
-        metadata = yr.read_yaml(g_yaml_path) # <- gens output folder folder
+        metadata = yr.read_yaml(g_yaml_path) # <- gens output folder
 
         U.g_TEST_PATH = metadata.output_dir
-        U.g_SIM_BUILD_PATH = metadata.output_dir + U.g_SIM_BUILD_PATH
+        U.g_SIM_BUILD_PATH = os.path.join(metadata.output_dir, U.g_SIM_BUILD_PATH)
         # print(f"U.g_TEST_PATH: {U.g_TEST_PATH}")
         # print(f"U.g_SIM_BUILD_PATH: {U.g_SIM_BUILD_PATH}")
 
@@ -206,34 +219,30 @@ if __name__ == "__main__":
 
         if(U.g_os_name == U.OS.WINDOWS.value):
             has_wsl = check_wsl_installed()
-            U.print_dash_line()
-            if(has_wsl):
+            if(not has_wsl):
+                raise RuntimeError("Missing WSL")
 
-                if(not is_sim_build_a_dir and g_compile):
-                    print("Compiling")
-                    exec_WSL(dir=metadata.output_dir, show_stderr=False, show_exit_code=False)
-                elif(not is_sim_build_a_dir and not g_compile and is_output_dir_empty):
-                    print("There is no template")
-                elif(not is_sim_build_a_dir and not g_compile and not is_output_dir_empty):
-                    print("Compiling and running")
-                    exec_WSL(dir=metadata.output_dir, show_stdout=False, show_stderr=False, show_exit_code=False)
-                    exec_WSL(dir=metadata.output_dir)
-                elif(is_sim_build_a_dir and is_sim_build_empty and g_compile):
-                    print("Retrying compilation")
-                    exec_WSL(dir=metadata.output_dir)
-                elif(is_sim_build_a_dir and not is_sim_build_empty and g_compile):
-                    print("Done")
-                elif(is_sim_build_a_dir and not is_sim_build_empty and not g_compile):
-                    print("Running")
-                    exec_WSL(dir=metadata.output_dir)
-            else:
-                print("Needed WSL")
-        else:
-            print("UBUNTU TO DO")
-
-
-
-
+        U.print_dash_line()
+        if(not is_sim_build_a_dir and g_compile):
+            print("Compiling")
+            general_exec(dir=metadata.output_dir, show_stderr=False, show_exit_code=False)
+        elif(not is_sim_build_a_dir and not g_compile and is_output_dir_empty):
+            print("There is no template")
+        elif(not is_sim_build_a_dir and not g_compile and not is_output_dir_empty):
+            print("Compiling and running")
+            print(metadata.output_dir)
+            general_exec(dir=metadata.output_dir, show_stdout=False, show_stderr=False, show_exit_code=False)
+            general_exec(dir=metadata.output_dir)
+        elif(is_sim_build_a_dir and is_sim_build_empty and g_compile):
+            print("Retrying compilation")
+            general_exec(dir=metadata.output_dir)
+        elif(is_sim_build_a_dir and not is_sim_build_empty and g_compile):
+            print("Done")
+        elif(is_sim_build_a_dir and not is_sim_build_empty and not g_compile):
+            print("Running")
+            general_exec(dir=metadata.output_dir)
+        U.print_dash_line()
+        print("Done")
 
 # # Obtener el PATH actual y agregar el nuevo directorio
 # current_path = os.environ['PATH']
