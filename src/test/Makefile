@@ -1,9 +1,9 @@
 # This file is public domain, it can be freely copied without restrictions.
 # SPDX-License-Identifier: CC0-1.0
 
-SIM = verilator
+SIM = questa
 TOPLEVEL_LANG = verilog
-SV_DIRS = /home/loop/Documents/HW/ALU
+SV_DIRS = /mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Pruebas/ALU
 VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))
 
 TOPLEVEL = ALU_RV32I

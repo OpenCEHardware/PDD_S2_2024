@@ -35,7 +35,7 @@ async def tb_ALU_RV32I(dut):
     await Timer(100, units='ns')
 
     # Some expected values
-    expected_values = [0, 1, 2, 3, 4, 5, 6, 7]
+    expected_values = [0, 2, 4, 6, 8, 10, 12, 13]
     len_expected_values = len(expected_values)
 
 
@@ -44,11 +44,11 @@ async def tb_ALU_RV32I(dut):
 
 
 
+    dut.op.value = 0
 
     # Concurrent tasks
+    cocotb.start_soon(stimulus_generator(dut.a, len_expected_values))
     cocotb.start_soon(stimulus_generator(dut.b, len_expected_values))
-    # Other inputs
-    # cocotb.start_soon(stimulus_generator(dut.other_input, len_expected_values))
 
     # Some output
     cocotb.start_soon(monitor(dut.o, scoreboard))

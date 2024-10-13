@@ -19,7 +19,8 @@ verilog_sources_and_include_dirs:
     
     # Directory to load all Verilog files from the specified paths.
     - load_all_from:
-      - /home/loop/Documents/HW/ALU
+      # - /home/loop/Documents/HW/ALU
+      - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\ALU
 
   # Include directories for Verilog files. These usually contain shared macros or definitions.
   - verilog_include_dirs:
@@ -30,8 +31,8 @@ verilog_sources_and_include_dirs:
     - load_all_from:
 
 # Simulator to be used for the simulation. Options are 'verilator' or 'questa'.
-simulator: verilator
-# simulator: questa
+# simulator: verilator
+simulator: questa
 
 # Time scale and precision for the simulation (1ns for time, 1ps for precision).
 # timescale_timeprecision: 1ns/1ps
