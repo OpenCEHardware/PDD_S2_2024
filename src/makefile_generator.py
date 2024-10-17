@@ -20,11 +20,15 @@ def gen_verilog_sources(metadata: yr.Metadata) -> str:
     template_section = ""
     plus = ""
 
-    if(metadata.verilog_sources_load_all_from != []):
-        if(metadata.verilog_sources_load_all_from[0] is not None):
+    paths_matrix =  metadata.get_paths_matrix()
+    VSSF = paths_matrix[0]
+    VSLA = paths_matrix[1]
+
+    if(VSLA != []):
+        if(VSLA[0] is not None):
             template_section = "SV_DIRS = "
-            for filepath in metadata.verilog_sources_load_all_from:
-                if(filepath != metadata.verilog_sources_load_all_from[-1]):
+            for filepath in VSLA:
+                if(filepath != VSLA[-1]):
                     template_section += filepath + " "
                 else:
                     template_section += filepath
@@ -32,23 +36,27 @@ def gen_verilog_sources(metadata: yr.Metadata) -> str:
             template_section += "\n" + """VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))"""
             plus = "+"
 
-    if(metadata.verilog_sources_specific_files != []):
+    if(VSSF != []):
         template_section += "VERILOG_SOURCES " + plus + "= "
-        for filepath in metadata.verilog_sources_specific_files:
-            if(filepath != metadata.verilog_sources_specific_files[-1]):
+        for filepath in VSSF:
+            if(filepath != VSSF[-1]):
                 template_section += filepath + " "
             else:
                 template_section += filepath
+
     return template_section
 
 
 def gen_verilog_includes(metadata: yr.Metadata) -> str:
     template_section = ""
-    if(metadata.verilog_include_dirs_load_all_from != []):
+
+    paths_matrix =  metadata.get_paths_matrix()
+    VIDLA = paths_matrix[3]
+    if(VIDLA != []):
 
         template_section = "VERILOG_INCLUDE_DIRS = "
-        for filepath in metadata.verilog_include_dirs_load_all_from:
-            if(filepath != metadata.verilog_include_dirs_load_all_from[-1]):
+        for filepath in VIDLA:
+            if(filepath != VIDLA[-1]):
                 template_section += filepath + " "
             else:
                 template_section += filepath
@@ -117,7 +125,6 @@ def write_template(filename, rendered_str, directory):
         file.write(rendered_str)
 
 def gen_makefile(metadata: yr.Metadata):
-    U.print_dash_line()
     print("Generating Makefile")
     rendered_str = generate_jinja_template(metadata)
     write_template("Makefile", rendered_str, metadata.output_dir)

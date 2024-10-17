@@ -1,9 +1,13 @@
 # Autococo (Automatic cocotb based hardware testbench generator tool)
 
 
+
+
 ## Overview
 
 This tool automates the creation of testbenches for hardware modules written in SystemVerilog (`.sv`), using cocotb as the test framework. It supports running simulations using **Verilator** or **Questa**, generating the necessary cocotb template and Makefile. The tool simplifies the testing workflow by automatically configuring the simulator, handling testbench creation, and managing file paths.
+
+
 
 
 ## Features
@@ -15,64 +19,50 @@ This tool automates the creation of testbenches for hardware modules written in 
 - **Cross-Platform Support**: Works on both Linux (Ubuntu) and Windows environments.
 
 
+
+
 ## Setup
 
 ### 1. Prerequisites
-
 Make sure the following dependencies are installed:
 
+#### For **Windows**, install:
 - **Python 3.x**
 - **PyYAML**: Install by running `pip install pyyaml`
 - **Jinja**: Install by running `pip install jinja2`
-- If you are running the tool on **Windows**, ensure that **WSL (Windows Subsystem for Linux)** is installed.
-
-In **WSL**, install:
-
-- **cocotb**: Run `pip install cocotb`
+- **WSL (Windows Subsystem for Linux)**
+##### On WSL, install
+- **cocotb**: Install by running `pip install cocotb`
 - **Verilator** and/or **Questa**, depending on your needs.
 - A functional **C++** compiler for use with Verilator.
-
-
-#### For windows
-##### Setting script policy in PowerShell
-```
-Set-ExecutionPolicy -ExecutionPolicy Bypass
-```
-
+- Set the script policy in PowerShell by running
+`Set-ExecutionPolicy -ExecutionPolicy Bypass`
 
 
 
 #### For Ubuntu
 
+##### Install cocotb (1.9.1 or 1.9.0) by running
 
-
-##### Install cocotb (1.9.1 or 1.9.0)
 `pip3 install cocotb`
-
 ###### Verify Installation
 `pip3 show cocotb`
-
 ###### Check if cocotb can be called
 `cocotb-config --version`
-
-###### If not working, add to PATH. Edit .bashrc with nano:
+###### If not, verify PATH. Edit the file .bashrc
 `nano ~/.bashrc`
-
 ###### Add the following line:
-export PATH=$PATH:/home/<user>/.local/bin
-
+export PATH=$PATH:/home/"user"/.local/bin
 ###### Apply changes for .bashrc
 `source ~/.bashrc`
 
 
 ##### Install Verilator (only 5.022 or higher)
-###### Install dependencies
+###### 1. Install dependencies
 `sudo apt-get install git make autoconf g++ flex bison libfl-dev libgoogle-perftools-dev numactl perl python3`
-
-###### Install help2man
+###### 2. Install help2man
 `sudo apt-get install help2man`
-
-###### Clone Verilator
+###### 3. Clone Verilator
 ```bash
 git clone https://github.com/verilator/verilator
 cd verilator
@@ -86,22 +76,16 @@ make -j$(nproc)
 make test
 sudo make install
 ```
-
-###### Verify Installation
-ls /usr/local/bin/verilator
-
 ###### This will place it here:
 /usr/local/bin/verilator
-
-###### However, when calling it, it looks for it here:
+###### Verify Installation
+`ls /usr/local/bin/verilator`
+###### However, when calling it, it looks for it here
 /usr/bin/verilator
-
-###### Add to PATH. Add the next line to .bashrc and then apply changes:
+###### 4. Add to PATH. Add the next line to the file .bashrc and then apply changes
 export PATH=$PATH:/usr/local/bin
-
-###### Now verilator --version should work and show something like:
-Verilator 5.028 2024-08-21 rev v5.028
-
+###### Verify installation
+`verilator --version`
 
 
 
@@ -126,17 +110,18 @@ Clone the repository and install the required Python packages.
 ```bash
 git clone https://github.com/MajinLoop/PDD_S2_2024.git
 cd <your-repo-directory>
-pip install -r requirements.txt
 ```
 
 
-## Usage
 
+
+## Usage
+### For windows
 1. Open PowerShell in the `src` directory.
-2. Execute the command: `python .\cmd_controller.py path\to\yaml_file`.
-3. This will generate a folder named "test" in the location specified in the YAML file, indicated by the key "output_dir".
-4. The flag `-c` compiles the code for the current sim.
-5. The flag `-r` runs the current template.
+2. Execute the command: `python .\cmd_controller.py path\to\yaml_file.yaml <flag>`.
+3. If uses `-r` resets the template.
+4. This will generate a folder in the location specified in the YAML file, indicated by the key "output_dir".
+5. No using flags result in
 
 
 ## Notes

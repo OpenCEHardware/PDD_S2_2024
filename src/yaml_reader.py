@@ -1,3 +1,6 @@
+#=======================================================================================================
+# Imports
+#=======================================================================================================
 import yaml
 import os
 import re
@@ -71,9 +74,11 @@ class Metadata:
                     self.verilog_sources_load_all_from = path_lists[0][1]
                     self.verilog_include_dirs_specific_files = path_lists[1][0]
                     self.verilog_include_dirs_load_all_from = path_lists[1][1]
+                    # print(f"self.verilog_sources_specific_files: {self.verilog_sources_specific_files}")
+                    # print(f"self.verilog_sources_load_all_from: {self.verilog_sources_load_all_from}")
+                    # print(f"self.verilog_include_dirs_specific_files: {self.verilog_include_dirs_specific_files}")
+                    # print(f"self.verilog_include_dirs_load_all_from: {self.verilog_include_dirs_load_all_from}")
                     self.verify_paths()
-                    if(U.g_os_name != U.OS.UBUNTU.value):
-                        self.convert_paths()
 
 
         key = self.Keys.SIMULATOR.value
@@ -186,9 +191,9 @@ class Metadata:
 
         return True
 
+
     def convert_paths(self):
         # self.output_dir = U.windows_to_wsl_path(self.output_dir)
-
         for i in range(len(self.verilog_sources_specific_files)):
             self.verilog_sources_specific_files[i] = U.covert_metadata_path(self.verilog_sources_specific_files[i])
 
@@ -200,6 +205,40 @@ class Metadata:
 
         for i in range(len(self.verilog_include_dirs_load_all_from)):
             self.verilog_include_dirs_load_all_from[i] = U.covert_metadata_path(self.verilog_include_dirs_load_all_from[i])
+
+
+    def get_paths_matrix(self):
+        if(U.g_os_name == U.OS.WINDOWS.value):
+            return self.get_converted_paths_matrix()
+        else:
+            return \
+                    [
+                        self.verilog_sources_specific_files,
+                        self.verilog_sources_load_all_from,
+                        self.verilog_include_dirs_specific_files,
+                        self.verilog_include_dirs_load_all_from
+                    ]
+
+
+    def get_converted_paths_matrix(self):
+        result = [[],[],[],[]]
+        for i in range(len(self.verilog_sources_specific_files)):
+            result[0].append(U.windows_to_wsl_path(self.verilog_sources_specific_files[i]))
+
+        for i in range(len(self.verilog_sources_load_all_from)):
+            result[1].append(U.windows_to_wsl_path(self.verilog_sources_load_all_from[i]))
+
+        for i in range(len(self.verilog_include_dirs_specific_files)):
+            result[2].append(U.windows_to_wsl_path(self.verilog_include_dirs_specific_files[i]))
+
+        for i in range(len(self.verilog_include_dirs_load_all_from)):
+            result[3].append(U.windows_to_wsl_path(self.verilog_include_dirs_load_all_from[i]))
+        return result
+
+
+    def get_comined_path_list(self) -> list:
+        return self.verilog_sources_specific_files + self.verilog_sources_load_all_from + self.verilog_include_dirs_specific_files + self.verilog_include_dirs_load_all_from
+
 
 
     def has_attribute(self, attr_name):
@@ -231,7 +270,6 @@ class Metadata:
 
 
 def read_yaml(yaml_filepath):
-    U.print_dash_line()
     print("Reading YAML")
 
     yaml_dic = None

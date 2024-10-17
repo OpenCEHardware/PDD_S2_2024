@@ -228,7 +228,6 @@ def write_template(filename, rendered_str, directory):
         file.write(rendered_str)
 
 def gen_template(metadata: yr.Metadata, template_option):
-    U.print_dash_line()
     print("Generating template")
     rendered_str = generate_jinja_template(metadata, template_option)
     write_template(f"{metadata.template_name}.py", rendered_str, directory=metadata.output_dir)
