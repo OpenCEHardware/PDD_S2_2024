@@ -142,7 +142,7 @@ def get_handle_resets_section(metadata: yr.Metadata) -> str:
     return template_section
 
 
-def generate_jinja_template(metadata: yr.Metadata, template_option) -> str:
+def generate_jinja_template(metadata: yr.Metadata) -> str:
     has_clocks_ = has_clocks(metadata)
     has_resets_ = has_resets(metadata)
     has_inputs_ = has_inputs(metadata)
@@ -160,11 +160,11 @@ def generate_jinja_template(metadata: yr.Metadata, template_option) -> str:
     some_DUT_input = ''
     some_DUT_output = ''
 
-    if(template_option == metadata.Template_types.SIMPLE.value):
+    if(metadata.template_type == metadata.Template_types.SIMPLE.value):
         with open(U.g_TEMPLATE_OPTION_0, 'r') as file:
             lines = file.readlines()
         template = ''.join(lines)
-    if(template_option == metadata.Template_types.STRUCTURED.value):
+    if(metadata.template_type == metadata.Template_types.STRUCTURED.value):
         with open(U.g_TEMPLATE_OPTION_1, 'r') as file:
             lines = file.readlines()
         template = ''.join(lines)
@@ -203,7 +203,8 @@ def generate_jinja_template(metadata: yr.Metadata, template_option) -> str:
     else:
         some_DUT_output = "some_output"
 
-    context = {
+    context = \
+    {
         "timescale_unit": metadata.timescale_unit,
         "DUT_name": metadata.DUT_name,
         "g_indent" : g_indent,
@@ -227,7 +228,7 @@ def write_template(filename, rendered_str, directory):
     with open(filepath, 'w') as file:
         file.write(rendered_str)
 
-def gen_template(metadata: yr.Metadata, template_option):
+def gen_template(metadata: yr.Metadata):
     print("Generating template")
-    rendered_str = generate_jinja_template(metadata, template_option)
+    rendered_str = generate_jinja_template(metadata)
     write_template(f"{metadata.template_name}.py", rendered_str, directory=metadata.output_dir)

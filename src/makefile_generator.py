@@ -28,10 +28,18 @@ def gen_verilog_sources(metadata: yr.Metadata) -> str:
         if(VSLA[0] is not None):
             template_section = "SV_DIRS = "
             for filepath in VSLA:
-                if(filepath != VSLA[-1]):
-                    template_section += filepath + " "
+                # if(filepath != VSLA[-1]):
+                #     template_section += filepath + " "
+                # else:
+                #     template_section += filepath
+
+                if(filepath == VSLA[0]):
+                    template_section += f'"{filepath}" \\\n'
+                elif(filepath != VSLA[-1]):
+                    template_section += f'          "{filepath}" \\\n'
                 else:
-                    template_section += filepath
+                    template_section += f'          "{filepath}"'
+
 
             template_section += "\n" + """VERILOG_SOURCES = $(foreach dir,$(SV_DIRS),$(shell find $(dir) -type f -name "*.sv"))"""
             plus = "+"
@@ -86,7 +94,6 @@ all: print_vars sim
 
 print_vars:
 ifeq ($(VERBOSE),1)
-	@echo "Running make..."
 	@echo "SIM: $(SIM)"
 	@echo "TOPLEVEL_LANG: $(TOPLEVEL_LANG)"
 	@echo "VERILOG_SOURCES: $(VERILOG_SOURCES)"

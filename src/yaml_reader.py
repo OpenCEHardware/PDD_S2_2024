@@ -1,8 +1,6 @@
-#=======================================================================================================
-# Imports
-#=======================================================================================================
 import yaml
 import os
+import sys
 import re
 from enum import Enum
 import Utils as U
@@ -26,72 +24,55 @@ class Metadata:
         CLOCKS = 'clocks'
         RESETS = 'resets'
         DUT_OUTPUTS = 'DUT_outputs'
+        QUARTUS_PROJECT_PATH = 'quartus_project_path'
+        SYNTHESIZABILITY_COMMAND = 'synthesizability_command'
+
 
     class Template_types(Enum):
         SIMPLE = 'simple'
         STRUCTURED = 'structured'
 
+
     def __init__(self, yaml):
         self.yaml = yaml
-        # print(f"YAML: {self.yaml}, type: {type(self.yaml)}")
-
         dictionary = self.yaml
 
-        key = self.Keys.OUTPUT_DIR.value
+        self.output_dir = self._get_required_key(dictionary, self.Keys.OUTPUT_DIR.value)
+        self.template_type = self._get_required_key(dictionary, self.Keys.TEMPLATE_TYPE.value)
+        self.simulator = self._get_required_key(dictionary, self.Keys.SIMULATOR.value)
+        self.timescale_timeprecision = self._parse_timescale(dictionary[self.Keys.TIMESCALE_TIMEPRESISION.value])
+        self.DUT_name = self._get_required_key(dictionary, self.Keys.DUT_NAME.value)
+        self.template_name = self._get_required_key(dictionary, self.Keys.TEMPLATE_NAME.value)
+        self.DUT_inputs = self._get_required_key(dictionary, self.Keys.DUT_INPUTS.value)
+        self.DUT_outputs = self._get_required_key(dictionary, self.Keys.DUT_OUTPUTS.value)
+        self.quartus_project_path = dictionary.get(Metadata.Keys.QUARTUS_PROJECT_PATH.value)
+        self.synthesizability_command = dictionary.get(Metadata.Keys.SYNTHESIZABILITY_COMMAND.value)
+
+        if self.is_valid_key(dictionary, self.Keys.VSAID.value):
+            d_list = dictionary[self.Keys.VSAID.value]
+            self._validate_vsaid_structure(d_list)
+            self._load_verilog_data()
+
+        self.verify_all_paths()
+
+
+    def _get_required_key(self, dictionary, key):
+        """Helper to fetch required keys."""
         if key not in dictionary:
             raise KeyError(f"yaml missing key: {key}")
-        else:
-            if dictionary[key] is None:
-                raise ValueError(f"key: {key} value is invalid")
-            else:
-                self.output_dir = yaml[key]
-
-        key = self.Keys.TEMPLATE_TYPE.value
-        if key not in dictionary:
-            raise KeyError(f"yaml missing key: {key}")
-        else:
-            if dictionary[key] is None:
-                raise ValueError(f"key: {key} value is invalid")
-            else:
-                self.template_type = yaml[key]
-
-        key = self.Keys.VSAID.value
-        if(self.valid_key(dictionary, key)):
-        
-            d_list = dictionary[key]
-            if(type(d_list) is not list):
-                raise TypeError(f"{key} value must be a list")
-            elif(len(d_list) != 2):
-                raise ValueError(f"{d_list} must have 2 elements")
-            
-            else:
-                if(self.is_dict(d_list[0]) and self.is_dict(d_list[1])):
-                    d_list = [d_list[0], d_list[1]]                   
-                    k_list = [self.Keys.VERILOG_SOURCES.value, self.Keys.VERILOG_INCLUDE_DIRS.value]
-                    path_lists = self.load_4_list_paths(d_list, k_list)
-
-                    self.verilog_sources_specific_files = path_lists[0][0]
-                    self.verilog_sources_load_all_from = path_lists[0][1]
-                    self.verilog_include_dirs_specific_files = path_lists[1][0]
-                    self.verilog_include_dirs_load_all_from = path_lists[1][1]
-                    # print(f"self.verilog_sources_specific_files: {self.verilog_sources_specific_files}")
-                    # print(f"self.verilog_sources_load_all_from: {self.verilog_sources_load_all_from}")
-                    # print(f"self.verilog_include_dirs_specific_files: {self.verilog_include_dirs_specific_files}")
-                    # print(f"self.verilog_include_dirs_load_all_from: {self.verilog_include_dirs_load_all_from}")
-                    self.verify_paths()
+        if not self.is_valid_key(dictionary, key):
+            raise ValueError(f"key: {key} value is invalid")
+        return dictionary[key]
 
 
-        key = self.Keys.SIMULATOR.value
-        if key not in dictionary:
-            raise KeyError(f"yaml missing key: {key}")
-        else:
-            if dictionary[key] is None:
-                raise ValueError(f"key: {key} value is invalid")
-            else:
-                self.simulator = yaml[key]
+    def is_dict(self, d) -> bool:
+        if not isinstance(d, dict):
+            raise TypeError(f"{d} must be a dictionary")
+        return True
 
-        timescale_timeprecision=yaml[self.Keys.TIMESCALE_TIMEPRESISION.value]
 
+    def _parse_timescale(self, timescale_timeprecision):
+        """Parse and validate the timescale and timeprecision."""
         pattern = r'(\d+)(\w+)/(\d+)(\w+)'
         match = re.search(pattern, timescale_timeprecision)
         if match:
@@ -105,111 +86,111 @@ class Metadata:
         else:
             raise ValueError(f"String {timescale_timeprecision} does not have match")
 
-        self.DUT_name = yaml[self.Keys.DUT_NAME.value]
-        self.template_name = yaml[self.Keys.TEMPLATE_NAME.value]
-        self.DUT_inputs = yaml[self.Keys.DUT_INPUTS.value]
-        self.DUT_outputs = yaml[self.Keys.DUT_OUTPUTS.value]
+
+    def _validate_vsaid_structure(self, d_list):
+        """Ensure the verilog_sources_and_include_dirs structure is valid."""
+        if not isinstance(d_list, list) or len(d_list) != 2:
+            raise ValueError(f"VSAID must be a list with 2 elements")
+        if not all(isinstance(d, dict) for d in d_list):
+            raise TypeError("Both elements in VSAID must be dictionaries")
 
 
-    def is_key(self, d, k):
-        if k not in d:
-            raise KeyError(f"YAML missing key: {k}")
+    def _load_verilog_data(self):
+        """Load verilog sources and include directories."""
+        verilog_data = self.yaml.get('verilog_sources_and_include_dirs', [])
+        aux = [[],[],[],[]]
+
+        # verilog_data = [d,d]
+        verilog_sources = verilog_data[0][Metadata.Keys.VERILOG_SOURCES.value] # [d,d]
+
+        specific_files = verilog_sources[0].get(Metadata.Keys.SPECIFIC_FILES.value, []) # []
+        specific_files = specific_files if specific_files else []
+        aux[0] = specific_files
+
+        load_all_from = verilog_sources[1].get(Metadata.Keys.LOAD_ALL_FROM.value, []) # []
+        load_all_from = load_all_from if load_all_from else []
+        aux[1] = load_all_from
+    
+        verilog_include_dirs = verilog_data[1][Metadata.Keys.VERILOG_INCLUDE_DIRS.value] # [d,d]
+
+        specific_files = verilog_include_dirs[0].get(Metadata.Keys.SPECIFIC_FILES.value, []) # []
+        specific_files = specific_files if specific_files else []
+        aux[2] = specific_files
+
+        load_all_from = verilog_include_dirs[1].get(Metadata.Keys.LOAD_ALL_FROM.value, []) # []
+        load_all_from = load_all_from if load_all_from else []
+        aux[3] = load_all_from
+
+        self.verilog_sources_specific_files = aux[0]
+        self.verilog_sources_load_all_from = aux[1]
+        self.verilog_include_dirs_specific_files = aux[2]
+        self.verilog_include_dirs_load_all_from = aux[3]
+
+    def is_valid_key(self, d, k, nullable=False) -> bool:
+        """Check if a key is valid and not None."""
+        if k not in d or (d[k] is None and not nullable):
+            raise ValueError(f"key: {k} value is invalid")
         return True
 
-    def valid_key(self, d, k) -> bool:
-        if(self.is_key(d, k)):
-            if d[k] is None:
-                raise ValueError(f"key: {k} value is invalid")
-        return True
 
     def load_paths(self, d, k) -> list:
-        path_list = []
-        if(self.is_key(d, k)):
-            value = d[k]
-            if value is not None:
-                if type(value) is list:
-                    path_list = value
-        return path_list
-
-    def is_dict(self, d) -> bool:
-        if(type(d) is not dict):
-            raise TypeError(f"{d} must be a dictionary")
-        return True
-
-    def load_2_list_paths(self, d_list, d_keys):
-        result = [[],[]]
-        d0, d1 = d_list
-        if(self.is_dict(d0) and self.is_dict(d1)):
-            result[0] = self.load_paths(d0, d_keys[0])
-            result[1] = self.load_paths(d1, d_keys[1])
-        return result
-
-    def load_4_list_paths(self, d_list, k_list):
-        result = []
-
-        for i in range(len(d_list)):
-            if(self.valid_key(d_list[i], k_list[i])):
-                aux_d_list = d_list[i][k_list[i]]
-                if(type(aux_d_list) is not list):
-                    raise TypeError(f"{k_list[i]} value must be a list")
-                elif(len(aux_d_list) != 2):
-                    raise ValueError(f"{aux_d_list} must have 2 elements")                        
-                else:
-                    aux_d_list = [aux_d_list[0], aux_d_list[1]]
-                    aux_k_list = [self.Keys.SPECIFIC_FILES.value, self.Keys.LOAD_ALL_FROM.value]
-                    result.append(self.load_2_list_paths(aux_d_list, aux_k_list))
-        return result
+        if self.is_valid_key(d, k) and isinstance(d[k], list):
+            return d[k]
+        return []
 
 
-    def verify_paths(self) -> bool:
+    def verify_all_paths(self) -> bool:
+        """Verify the existence and validity of various paths."""
+        
         path = Path(self.output_dir)
-        if path.is_file():
-            raise ValueError(f"The value: {self.output_dir} must be a directory")
         if not path.is_dir():
             path.mkdir(parents=True, exist_ok=True)
 
+        self._verify_path_list(self.verilog_sources_specific_files, file_check=True)
+        self._verify_path_list(self.verilog_sources_load_all_from, dir_check=True)
+        self._verify_path_list(self.verilog_include_dirs_specific_files, file_check=True)
+        self._verify_path_list(self.verilog_include_dirs_load_all_from, dir_check=True)
 
-        for filepath in self.verilog_sources_specific_files:
-            path = Path(filepath)
-            if not path.is_file():
-                raise ValueError(f"The value {filepath} is not a file")
-        for directory in self.verilog_sources_load_all_from:
-            path = Path(directory)
-            if not path.is_dir():
-                raise ValueError(f"The path {directory} is not a directory")
-        for filepath in self.verilog_include_dirs_specific_files:
-            path = Path(filepath)
-            if not path.is_file():
-                raise ValueError(f"The value {filepath} is not a file")
-        for directory in self.verilog_include_dirs_load_all_from:
-            path = Path(directory)
-            if not path.is_dir():
-                raise ValueError(f"The path {directory} is not a directory")
-    
-        if(self.verilog_sources_specific_files == [] and self.verilog_sources_load_all_from == []):
+        if not any([self.verilog_sources_specific_files, self.verilog_sources_load_all_from]):
             raise ValueError("Modules not found")
+
+        # self._verify_quartus_project()
 
         return True
 
 
-    def convert_paths(self):
-        # self.output_dir = U.windows_to_wsl_path(self.output_dir)
-        for i in range(len(self.verilog_sources_specific_files)):
-            self.verilog_sources_specific_files[i] = U.covert_metadata_path(self.verilog_sources_specific_files[i])
+    def _verify_path_list(self, path_list, file_check=False, dir_check=False):
+        """Verify a list of paths are either files or directories."""
+        try:
+            for path in path_list:
+                path = Path(path)
+                if file_check and not path.is_file():
+                    raise ValueError(f"The path {path} is not a valid file")
+                if dir_check and not path.is_dir():
+                    raise ValueError(f"The path {path} is not a valid directory")
+        except ValueError as e:
+            print(f"Error: {e}")
+            sys.exit()
 
-        for i in range(len(self.verilog_sources_load_all_from)):
-            self.verilog_sources_load_all_from[i] = U.covert_metadata_path(self.verilog_sources_load_all_from[i])
 
-        for i in range(len(self.verilog_include_dirs_specific_files)):
-            self.verilog_include_dirs_specific_files[i] = U.covert_metadata_path(self.verilog_include_dirs_specific_files[i])
+    def _verify_quartus_project(self):
+        """Verify the Quartus project path is a valid directory."""
 
-        for i in range(len(self.verilog_include_dirs_load_all_from)):
-            self.verilog_include_dirs_load_all_from[i] = U.covert_metadata_path(self.verilog_include_dirs_load_all_from[i])
+        try:
+
+            quartus_path = Path(self.quartus_project_path)
+            if not quartus_path.is_dir():    
+                raise ValueError(f"The Quartus project path {self.quartus_project_path} is not a valid directory")
+
+        except ValueError as e:
+
+            print(f"Error: {e}")
+            sys.exit()
 
 
     def get_paths_matrix(self):
         if(U.g_os_name == U.OS.WINDOWS.value):
-            return self.get_converted_paths_matrix()
+            return self.get_converted_to_WSL_paths_matrix()
         else:
             return \
                     [
@@ -220,7 +201,7 @@ class Metadata:
                     ]
 
 
-    def get_converted_paths_matrix(self):
+    def get_converted_to_WSL_paths_matrix(self):
         result = [[],[],[],[]]
         for i in range(len(self.verilog_sources_specific_files)):
             result[0].append(U.windows_to_wsl_path(self.verilog_sources_specific_files[i]))
@@ -236,37 +217,25 @@ class Metadata:
         return result
 
 
-    def get_comined_path_list(self) -> list:
+    def get_combined_path_list(self) -> list:
         return self.verilog_sources_specific_files + self.verilog_sources_load_all_from + self.verilog_include_dirs_specific_files + self.verilog_include_dirs_load_all_from
 
 
-
-    def has_attribute(self, attr_name):
-        return hasattr(self, attr_name) and getattr(self, attr_name) is not None
-
-
-    def has_any_attribute(self, *attr_names):
-        return any(self.has_attribute(attr) for attr in attr_names)
-
-
-    def has_data_in(self, dictionary, key):
-        return (self.find_value(dictionary, key) is not None)
-
-
     def display(self):
-        print(f"Output Directory: {self.output_dir}, type: {type(self.output_dir)}")
-        print(f"Template type: {self.template_type}, type: {type(self.template_type)}")
-        print(f"Verilog sources specific files: {self.verilog_sources_specific_files}, type: {type(self.verilog_sources_specific_files)}")
-        print(f"Verilog sources load all from: {self.verilog_sources_load_all_from}, type: {type(self.verilog_sources_load_all_from)}")
-        print(f"Verilog include dirs specific files: {self.verilog_include_dirs_specific_files}, type: {type(self.verilog_include_dirs_specific_files)}")
-        print(f"Verilog include dirs load all from: {self.verilog_include_dirs_load_all_from}, type: {type(self.verilog_include_dirs_load_all_from)}")
-        print(f"Simulator: {self.simulator}, type: {type(self.simulator)}")
+        print(f"Output Directory: {self.output_dir}")
+        print(f"Template type: {self.template_type}")
+        print(f"Verilog sources specific files: {self.verilog_sources_specific_files}")
+        print(f"Verilog sources load all from: {self.verilog_sources_load_all_from}")
+        print(f"Verilog include dirs specific files: {self.verilog_include_dirs_specific_files}")
+        print(f"Verilog include dirs load all from: {self.verilog_include_dirs_load_all_from}")
+        print(f"Simulator: {self.simulator}")
         print(f"Timescale: {self.timescale_magnitude}{self.timescale_unit}, type: {type(self.timescale_magnitude)} and {type(self.timescale_unit)}")
         print(f"Timeprecision: {self.timeprecision_magnitude}{self.timeprecision_unit}, type: {type(self.timeprecision_magnitude)} and {type(self.timeprecision_unit)}")
-        print(f"DUT Name: {self.DUT_name}, type: {type(self.DUT_name)}")
-        print(f"Template Name: {self.template_name}, type: {type(self.template_name)}")
-        print(f"DUT Inputs: {self.DUT_inputs}, type: {type(self.DUT_inputs)}")
-        print(f"DUT Outputs: {self.DUT_outputs}, type: {type(self.DUT_outputs)}")
+        print(f"DUT Name: {self.DUT_name}")
+        print(f"Template Name: {self.template_name}")
+        print(f"DUT Inputs: {self.DUT_inputs}")
+        print(f"DUT Outputs: {self.DUT_outputs}")
+        print(f"Quartus Project Path: {self.quartus_project_path}")
 
 
 def read_yaml(yaml_filepath):
@@ -276,9 +245,10 @@ def read_yaml(yaml_filepath):
     try:
         with open(yaml_filepath, 'r') as file:
             yaml_dic = yaml.safe_load(file)
-    except:
+    except FileNotFoundError:
         raise FileNotFoundError(f"The file {yaml_filepath} was not found.")
-    if(type(yaml_dic) != dict):
+    
+    if not isinstance(yaml_dic, dict):
         raise ValueError("yaml_dic must be a valid dictionary")
-    else:
-        return Metadata(yaml_dic)
+    
+    return Metadata(yaml_dic)

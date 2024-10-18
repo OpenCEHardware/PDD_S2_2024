@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1729253541" />
+    <testcase name="tb_ALU_RV32I" classname="tbs" file="/mnt/d/D/TEC/2024/S2/Proyecto_de_diseno/Repos/PDD_S2_2024/src/out/tbs.py" lineno="32" time="0.0029265880584716797" sim_time_ns="180.001" ratio_time="61505.41053393076" />
+  </testsuite>
+</testsuites>

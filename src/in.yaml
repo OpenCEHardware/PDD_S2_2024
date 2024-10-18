@@ -26,12 +26,15 @@ verilog_sources_and_include_dirs:
     # Directory to load all Verilog files from the specified paths.
     - load_all_from:
       # - /home/loop/Documents/HW/ALU
-      - D:\D\TEC\2024\S2\Proyecto_de_diseno\Pruebas\ALU
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\RV32I
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Multiplexers
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Integer_Arithmetic
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Complements
 
   # Include directories for Verilog files. These usually contain shared macros or definitions.
   - verilog_include_dirs:
     # Section to specify individual include files.
-    - specific_files: 
+    - specific_files:
 
     # Directory to load all include files from the specified ptahs.
     - load_all_from:
@@ -66,3 +69,13 @@ DUT_inputs:
 # Definition of DUT outputs.
 DUT_outputs:
   - o
+
+# Optional key
+quartus_project_path:
+# quartus_project_path: D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu
+
+# Define the command for synthesizability verification of the module.
+# Ensure that the command is valid and that the execution environment
+# has access to the necessary tools.
+synthesizability_command: quartus_sh --flow compile Logic_Circuit_Main
+# synthesizability_command:

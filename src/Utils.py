@@ -153,7 +153,7 @@ def create_dir(folder_path):
         print(f"Error creating dir: {e}")
 
 
-def find_sv_files(paths):
+def find_sv_files(paths: list) -> list:
     sv_files = []
     for path in paths:
         if os.path.exists(path) and os.path.isdir(path):

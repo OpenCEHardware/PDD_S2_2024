@@ -7,14 +7,18 @@ import sys
 import shutil
 import argparse
 from pathlib import Path
+import time
 
 import yaml_reader as yr
 import template_generator as tg
 import makefile_generator as mg
+import quartus_synth_manager as qsm
 import Utils as U
 
 # https://docs.cocotb.org/en/stable/building.html#envvar-COCOTB_ENABLE_PROFILING
-# ================================================================================================================
+#=======================================================================================================
+# Globals
+#=======================================================================================================
 # paths
 g_yaml_path = ''
 g_src_dir = os.getcwd()
@@ -22,7 +26,7 @@ TXT_TO_KNOW_PREVIOUS_SIMULATOR = "sim.txt"
 
 # flags
 g_reset_template = False
-g_compile = False
+g_execute = False
 
 # qsf default values
 QUARTUS_PROJECT_NAME = "project"
@@ -48,9 +52,9 @@ g_simulator = ""
 
 # Error msgs
 NO_WSL_MSG_ERR_STR = "Windows Subsystem for Linux has not been enabled"
-# ================================================================================================================
-### Checks
-## WSL
+#=======================================================================================================
+# Defs
+#=======================================================================================================
 def check_wsl_installed():
     """
     Checks if Windows Subsystem for Linux (WSL) is installed and enabled on the system.
@@ -59,45 +63,24 @@ def check_wsl_installed():
     If WSL is not enabled or an error occurs during the command execution, it prints an error message.
     It returns a boolean indicating whether WSL is installed and enabled.
 
-    Returns:
-        bool: True if WSL is installed and enabled, False otherwise.
-
     Raises:
         subprocess.CalledProcessError: If there is an error executing the `wsl` command.
     """
+    if(U.g_os_name == U.OS.WINDOWS.value):
+        has_WSL = False
+        try:
+            result = subprocess.run(["wsl", "--list"], capture_output=True, text=True, check=True)
 
-    has_WSL = False
-    try:
-        result = subprocess.run(["wsl", "--list"], capture_output=True, text=True, check=True)
+            if NO_WSL_MSG_ERR_STR in result.stderr:
+                print("WSL is not enabled on your system.")
+            else:
+                has_WSL = True
 
-        if NO_WSL_MSG_ERR_STR in result.stderr:
-            print("WSL is not enabled on your system.")
-        else:
-            # print("WSL está instalado y habilitado.")
-            # print("Distribuciones instaladas:")
-            # print(result.stdout)
-            has_WSL = True
-    except subprocess.CalledProcessError as e:
-        print(f"Error verifiying WSL: {e}")
-    return has_WSL
+        except subprocess.CalledProcessError as e:
+            print(f"Error verifiying WSL: {e}")
 
-
-def check_sv_file(file_path):
-    directory = os.path.dirname(file_path)
-    
-    # Check that the directory exists
-    if not os.path.isdir(directory):
-        raise argparse.ArgumentTypeError(f"The directory '{directory}' does not exist.")
-
-    # Check that the file exists
-    if not os.path.isfile(file_path):
-        raise argparse.ArgumentTypeError(f"The file '{file_path}' does not exist.")
-
-    # Check that the file has a .sv extension
-    if not file_path.endswith('.sv'):
-        raise argparse.ArgumentTypeError(f"The file '{file_path}' does not have a .sv extension.")
-    
-    return file_path
+        if(not has_WSL):
+            raise RuntimeError("Missing WSL")
 
 
 def general_exec \
@@ -109,7 +92,28 @@ def general_exec \
         show_stderr=True,
         show_exit_code=True
     ):
+    """
+    Executes a command in the specified environment (WSL or Terminal).
 
+    This function allows the execution of a command either in Windows Subsystem for Linux (WSL) or a terminal,
+    depending on the operating system. It supports handling output display options such as stdout, stderr, 
+    and exit code. The command is executed from a specific directory if provided, and it returns to the 
+    original directory after execution.
+
+    Args:
+        command_receiver (str): Specifies the environment to run the command, either PowerShell, WSL or Terminal.
+        command (str): The command to be executed.
+        dir (str, optional): The directory to switch to before executing the command. Defaults to None.
+        show_stdout (bool, optional): Whether to display standard output. Defaults to True.
+        show_stderr (bool, optional): Whether to display standard error output. Defaults to True.
+        show_exit_code (bool, optional): Whether to display the exit code of the command. Defaults to True.
+
+    Raises:
+        subprocess.CalledProcessError: If the command execution fails or encounters an error.
+
+    Returns:
+        None: The function does not return any value but may raise exceptions on errors.
+    """
     if show_stdout:
         U.print_dash_line('-')
         if(U.g_os_name == U.OS.WINDOWS.value):
@@ -131,6 +135,7 @@ def general_exec \
             if(command_receiver == U.COMMAND_RECEIVER.WSL.value):
                 command = convert_command_to_PS_WSL(command)
             result = exec_powershell(command)
+
         else: # Ubuntu
             result = exec_terminal(command)
 
@@ -143,97 +148,92 @@ def general_exec \
 
 
 def show_command_info(result, command, show_stdout, show_stderr, show_exit_code):
-    U.print_dash_line('-')
+    """
+    Displays the result information of a command execution.
 
-    if(show_stdout or show_stderr or show_exit_code):
-        print(f"Executing the command: {command}")
+    Args:
+        result: The result object of the executed command (should contain stdout, stderr, returncode).
+        command (str): The command that was executed.
+        show_stdout (bool): Whether to display the standard output.
+        show_stderr (bool): Whether to display the standard error output.
+        show_exit_code (bool): Whether to display the exit code of the command.
+    """
+    U.print_dash_line('-')
+    
+    # Display the command being executed
+    if show_stdout or show_stderr or show_exit_code:
+        print(f"Running command: {command}")
         U.print_dash_line('-')
 
-        if show_stdout:
-            if(U.g_os_name == U.OS.WINDOWS.value):
-                print("WSL stdout (output):")
-            else:
-                print("Terminal stdout (output):")
-            print(result.stdout if result.stdout else "No stdout")
-            U.print_dash_line('-')
+    # Show stdout
+    if show_stdout:
+        print(f"stdout (output):")
+        print(result.stdout if result.stdout else "No stdout")
+        U.print_dash_line('-')
 
-        if show_stderr:
-            if(U.g_os_name == U.OS.WINDOWS.value):
-                print("WSL stderr (errors):")
-            else:
-                print("Terminal stderr (errors):")
-            print(result.stderr if result.stderr else "No stderr")
-            U.print_dash_line('-')
+    # Show stderr
+    if show_stderr:
+        print(f"stderr (errors):")
+        print(result.stderr if result.stderr else "No stderr")
+        U.print_dash_line('-')
 
-        if show_exit_code:
-            print(f"Return code: {result.returncode}")
-            U.print_dash_line('-')
+    # Show exit code and status
+    if show_exit_code:
+        print(f"Return code: {result.returncode}")
+        U.print_dash_line('-')
 
-            if result.returncode != 0:
-                print("The command failed.")
-            else:
-                print("The command succeeded.")
+        # Check command success
+        if result.returncode != 0:
+            print("The command failed.")
+        else:
+            print("The command succeeded.")
+
 
 def exec_powershell(command):
+    """
+    Executes a PowerShell command using subprocess.
+
+    Args:
+        command (str): The PowerShell command to execute.
+        timeout (int, optional): Maximum time to wait for command execution. Defaults to None.
+
+    Returns:
+        subprocess.CompletedProcess: Result of the command execution, including stdout, stderr, and returncode.
+    """
     return subprocess.run(["powershell", "-Command", command], capture_output=True, text=True)
 
+
 def convert_command_to_PS_WSL(command):
+    """
+    Converts a command intended for a Unix-like shell into a format that can be run via PowerShell using WSL (Windows Subsystem for Linux).
+
+    This function wraps the given command string in a format that runs the command in WSL (Windows Subsystem for Linux) through PowerShell. It uses `wsl -e bash -ic` to invoke the bash shell in WSL and pass the command for execution.
+
+    Flags used:
+        - `-e`: Specifies the executable that WSL should run (in this case, `bash`). Without this, WSL runs the default shell. The `-e` flag allows you to specify another shell or program to execute.
+        - `-i`: Starts an interactive shell session. This ensures that user-specific startup files are executed, and the session behaves like a regular interactive terminal.
+        - `-c`: Executes the command provided as a string argument to the shell. It runs the command and then exits.
+        - `-ic`: Combines `-i` and `-c` to first start an interactive shell (`-i`), then execute the command passed as an argument (`-c`). This allows you to run commands in an interactive environment and execute them immediately.
+
+    Args:
+        command (str): The command to be executed in the WSL bash environment.
+
+    Returns:
+        str: A formatted string that runs the given command in WSL via PowerShell.
+    
+    Example:
+        >>> convert_command_to_PS_WSL("ls")
+        'wsl -e bash -ic "ls"'
+    """
     return f'wsl -e bash -ic "{command}"'
+
 
 def exec_terminal(command):
     return subprocess.run(command, check=True, text=True, capture_output=True)
 
 
-def modify_qsf \
-    (
-        metadata: yr.Metadata,
-        family = 'Cyclone V',
-        device = 'AUTO',
-        top_level_entity = 'project',
-        # original_quartus_version = '20.1.0',
-        # project_creation_time_date = '02:48:38  OCTOBER 17, 2024',
-        # last_quartus_version = '20.1.0 Lite Edition'
-    ):
-
-    qsf_filepath = os.path.join(U.g_quartus_dir, f"{QUARTUS_PROJECT_NAME}.qsf")
-
-    with open(qsf_filepath, 'r') as file:
-        lines = file.readlines()
-
-    assignments_to_change = \
-    {
-        "FAMILY": f'"{family}"'
-        ,"DEVICE": device
-        ,"TOP_LEVEL_ENTITY": top_level_entity
-        # ,"ORIGINAL_QUARTUS_VERSION" : original_quartus_version
-        # ,"PROJECT_CREATION_TIME_DATE" : project_creation_time_date
-        # ,"LAST_QUARTUS_VERSION" : last_quartus_version
-    }
-
-    for key, value in assignments_to_change.items():
-        for i in range(len(lines)):
-            if key in lines[i]:
-                lines[i] = f'set_global_assignment -name {key} {value}\n'
-
-    lines.append("\n\n\n")
-
-    sv_files = U.find_sv_files(metadata.get_comined_path_list())
-    for sv in sv_files:
-        lines.append(f'set_global_assignment -name VERILOG_FILE {sv}\n')
-
-    with open(qsf_filepath, 'w') as file:
-        file.writelines(lines)
-
-# set_global_assignment -name FAMILY "Cyclone V"
-# set_global_assignment -name DEVICE AUTO
-# set_global_assignment -name TOP_LEVEL_ENTITY project
-# set_global_assignment -name ORIGINAL_QUARTUS_VERSION 20.1.0
-# set_global_assignment -name PROJECT_CREATION_TIME_DATE "03:18:32  OCTOBER 17, 2024"
-# set_global_assignment -name LAST_QUARTUS_VERSION "20.1.0 Lite Edition"
-
-
 def cmd_parser():
-    global g_yaml_path, g_reset_template, g_compile
+    global g_yaml_path, g_reset_template, g_execute
     parser = argparse.ArgumentParser(description="Tool entrypoint.")
 
     parser.add_argument \
@@ -245,7 +245,7 @@ def cmd_parser():
 
     parser.add_argument \
     (
-        "-c",
+        "-e",
         action="store_true",
         help="Run make without overwriting template and makefile."
     )
@@ -272,14 +272,7 @@ def cmd_parser():
     # set globals values
     g_yaml_path = args.yaml_filepath
     g_reset_template = args.r
-    g_compile = args.c
-
-    try:
-        if(g_compile and g_reset_template):
-            raise RuntimeError("Use just 1 flag between -c and -r")
-    except RuntimeError as e:
-        print(e)
-        sys.exit()
+    g_execute = args.e
 
 
 def get_output_dir_status():
@@ -294,12 +287,6 @@ def get_sim_build_dir_status():
     g_is_sim_build_a_dir = Path(U.g_sim_build_dir).is_dir()
     if(g_is_sim_build_a_dir):
         g_is_sim_build_empty = U.is_directory_empty(U.g_sim_build_dir)
-
-def get_quartus_p_dir_status():
-    global g_is_quartus_p_a_dir, g_is_quartus_p_empty
-    g_is_quartus_p_a_dir = Path(U.g_quartus_dir).is_dir()
-    if(g_is_quartus_p_a_dir):
-        g_is_quartus_p_empty = U.is_directory_empty(U.g_quartus_dir)
 
 
 def get_template_status():
@@ -318,7 +305,7 @@ def get_simulator_status(metadata: yr.Metadata):
     if(g_simulator == U.SIM.VERILATOR.value.lower()):
         g_simulator = U.SIM.VERILATOR.value
     elif(g_simulator == U.SIM.QUESTA.value.lower()):
-        g_simulator = U.SIM.QUESTA.value        
+        g_simulator = U.SIM.QUESTA.value
 
 
 def check_simulator_change(metadata: yr.Metadata):
@@ -328,34 +315,41 @@ def check_simulator_change(metadata: yr.Metadata):
         U.clear_directory_except(dir=U.g_output_dir, filename_to_keep=f"{metadata.template_name}.py")
 
 
-def check_errors():
-    # Handling errors
-    get_output_dir_status()
-    if(not g_is_output_a_dir):
-        print("Error generating output dir")
-        sys.exit()
-
-    if(g_is_output_empty):
-        print("Error writing data in output dir")
-        sys.exit()
-
+def gen_template(metadata: yr.Metadata):
     get_template_status()
-    if(not g_exists_template):
-        print("Error reading template")
-        sys.exit()
+    if(g_exists_template):
+        if(g_reset_template):
+            tg.gen_template(metadata)
+        else:
+            print("Using current template")
+    else:
+        tg.gen_template(metadata)
 
+
+def gen_makefile(metadata: yr.Metadata):
     get_makefile_status()
-    if(not g_exists_makefile):
-        print("Error reading Makefile")
-        sys.exit()
-
-    get_quartus_p_dir_status()
-    if(not g_is_quartus_p_a_dir):
-        print("Error generating quartus_p dir")
-        sys.exit()
+    mg.gen_makefile(metadata)
 
 
-def start():
+def handle_quartus(metadata: yr.Metadata):
+    global g_is_quartus_p_a_dir, g_is_quartus_p_empty
+
+    # Check dir and dir emptyness
+    if(metadata.quartus_project_path):
+        g_is_quartus_p_a_dir = Path(metadata.quartus_project_path).is_dir()
+
+    if(g_is_quartus_p_a_dir):
+        g_is_quartus_p_empty = U.is_directory_empty(metadata.quartus_project_path)
+
+    if(not g_is_quartus_p_a_dir or g_is_quartus_p_empty):
+        print(f"Warning: There is no Quartus project")
+
+    else:
+        print("Checking Quartus")
+        qsm.handle_quartus_synthesis(metadata)
+
+
+def execute():
     # Execute
     if(not g_is_sim_build_a_dir):
         print("Compiling and running")
@@ -370,11 +364,12 @@ def start():
     elif(g_is_sim_build_a_dir and not g_is_sim_build_empty):
         print("Running")
         general_exec(dir=metadata.output_dir, show_stdout=True, show_stderr=True, show_exit_code=True)
-
-
-if __name__ == "__main__":
-    # Initialize
+#=======================================================================================================
+# Entrypoint
+#=======================================================================================================
+if __name__ == "__main__":    
     U.recognize_os()
+    check_wsl_installed()
     cmd_parser()
 
     # Reads YAML
@@ -389,45 +384,36 @@ if __name__ == "__main__":
     check_simulator_change(metadata) # Clears dir if the sim changes (except the template)
     get_sim_build_dir_status()
 
-    # Template
-    U.print_dash_line()
-    get_template_status()
-    if(g_exists_template):
-        if(g_reset_template):
-            tg.gen_template(metadata, template_option=metadata.template_type)
-        else:
-            print("Using current template")
-    else:
-        tg.gen_template(metadata, template_option=metadata.template_type)
-
-    # Makefile
-    U.print_dash_line()
-    get_makefile_status()
-    mg.gen_makefile(metadata)
-
-    # For Windows checks WSL
-    if(U.g_os_name == U.OS.WINDOWS.value):
-        has_wsl = check_wsl_installed()
-        if(not has_wsl):
-            raise RuntimeError("Missing WSL")
-    
-    # check_errors()
-
-    # Quartus project
-    get_quartus_p_dir_status()
-    if(not g_is_quartus_p_a_dir or g_is_quartus_p_empty):
+    # Preparation
+    if not g_execute:
+        # Template
         U.print_dash_line()
-        if(not g_is_quartus_p_a_dir):
-            U.create_dir(folder_path=U.g_quartus_dir)
-            print("Creating Quartus dir")
-        if(g_is_quartus_p_empty):
-            print("Writing .qsf")
-            general_exec(command_receiver=U.COMMAND_RECEIVER.POWERSHELL.value,command=CREATE_QUARTUS_PROJECT_COMMAND,show_stdout=False, dir=U.g_quartus_dir)
-            modify_qsf(metadata, family=g_family, device=g_device, top_level_entity=g_top_level_entity)
+        gen_template(metadata)
+
+        # Makefile
+        U.print_dash_line()
+        gen_makefile(metadata)
+    
+        # Quartus project
+        U.print_dash_line()
+        handle_quartus(metadata)
+
+        U.print_dash_line()
+        print(f"Done.")
+        U.print_dash_line()
 
     # Execute
-    U.print_dash_line()
-    start()
+    if g_execute:
+        # Get duration
+        start_time = time.time()
 
-    U.print_dash_line()
-    print("Done")
+        U.print_dash_line()
+        execute()
+
+        # Get duration
+        end_time = time.time()
+        duration = end_time - start_time
+
+        U.print_dash_line()
+        print(f"Done. Duration: {duration:.2f}s")
+        U.print_dash_line()
