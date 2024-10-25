@@ -14,6 +14,7 @@ import template_generator as tg
 import makefile_generator as mg
 import quartus_synth_manager as qsm
 import Utils as U
+import reporter as rep
 
 # https://docs.cocotb.org/en/stable/building.html#envvar-COCOTB_ENABLE_PROFILING
 #=======================================================================================================
@@ -27,6 +28,7 @@ TXT_TO_KNOW_PREVIOUS_SIMULATOR = "sim.txt"
 # flags
 g_reset_template = False
 g_execute = False
+g_ignore_quartus = False
 
 # qsf default values
 QUARTUS_PROJECT_NAME = "project"
@@ -35,7 +37,7 @@ g_device = "AUTO"
 g_top_level_entity = "project"
 
 # commands
-MAKE_COMMAND = "make"
+MAKE_COMMAND = "make profile"
 CREATE_QUARTUS_PROJECT_COMMAND = f"quartus_sh --prepare {QUARTUS_PROJECT_NAME}.qpf" # PSC
 COMPILE_COMPILE_PROJECT = f"quartus_sh --flow compile {QUARTUS_PROJECT_NAME}"
 
@@ -85,12 +87,13 @@ def check_wsl_installed():
 
 def general_exec \
     (
-        command_receiver=U.COMMAND_RECEIVER.WSL.value,
-        command=MAKE_COMMAND,
-        dir=None,
-        show_stdout=True,
-        show_stderr=True,
-        show_exit_code=True
+        metadata: yr.Metadata
+        ,command_receiver=U.COMMAND_RECEIVER.WSL.value
+        ,command=MAKE_COMMAND
+        ,dir=None
+        ,show_stdout=True
+        ,show_stderr=True
+        ,show_exit_code=True
     ):
     """
     Executes a command in the specified environment (WSL or Terminal).
@@ -139,7 +142,7 @@ def general_exec \
         else: # Ubuntu
             result = exec_terminal(command)
 
-        show_command_info(result, command, show_stdout, show_stderr, show_exit_code)
+        show_command_info(metadata, result, command, show_stdout, show_stderr, show_exit_code)
 
         os.chdir(g_src_dir)
     except subprocess.CalledProcessError as e:
@@ -147,7 +150,7 @@ def general_exec \
         pass
 
 
-def show_command_info(result, command, show_stdout, show_stderr, show_exit_code):
+def show_command_info(metadata:yr.Metadata, result, command, show_stdout, show_stderr, show_exit_code):
     """
     Displays the result information of a command execution.
 
@@ -158,6 +161,7 @@ def show_command_info(result, command, show_stdout, show_stderr, show_exit_code)
         show_stderr (bool): Whether to display the standard error output.
         show_exit_code (bool): Whether to display the exit code of the command.
     """
+    rep.log(metadata, result, source=rep.Sources.COCOTB)
     U.print_dash_line('-')
     
     # Display the command being executed
@@ -167,13 +171,13 @@ def show_command_info(result, command, show_stdout, show_stderr, show_exit_code)
 
     # Show stdout
     if show_stdout:
-        print(f"stdout (output):")
+        print(f"stdout:")
         print(result.stdout if result.stdout else "No stdout")
         U.print_dash_line('-')
 
     # Show stderr
     if show_stderr:
-        print(f"stderr (errors):")
+        print(f"stderr:")
         print(result.stderr if result.stderr else "No stderr")
         U.print_dash_line('-')
 
@@ -233,7 +237,7 @@ def exec_terminal(command):
 
 
 def cmd_parser():
-    global g_yaml_path, g_reset_template, g_execute
+    global g_yaml_path, g_reset_template, g_execute, g_ignore_quartus
     parser = argparse.ArgumentParser(description="Tool entrypoint.")
 
     parser.add_argument \
@@ -247,14 +251,21 @@ def cmd_parser():
     (
         "-e",
         action="store_true",
-        help="Run make without overwriting template and makefile."
+        help="Execute template."
     )
 
     parser.add_argument \
     (
         "-r",
         action="store_true",
-        help="Run make without overwriting template."
+        help="Resets template."
+    )
+
+    parser.add_argument \
+    (
+        "-i",
+        action="store_true",
+        help="Ignore Quartus check."
     )
 
     parser.add_argument \
@@ -273,6 +284,7 @@ def cmd_parser():
     g_yaml_path = args.yaml_filepath
     g_reset_template = args.r
     g_execute = args.e
+    g_ignore_quartus = args.i
 
 
 def get_output_dir_status():
@@ -349,21 +361,21 @@ def handle_quartus(metadata: yr.Metadata):
         qsm.handle_quartus_synthesis(metadata)
 
 
-def execute():
+def execute(metadata: yr.Metadata):
     # Execute
     if(not g_is_sim_build_a_dir):
         print("Compiling and running")
         if(g_simulator == U.SIM.VERILATOR.value):
-            general_exec(dir=metadata.output_dir, show_stdout=False, show_stderr=False, show_exit_code=False)
-        general_exec(dir=metadata.output_dir, show_stdout=True, show_stderr=True, show_exit_code=True)
+            general_exec(metadata, dir=metadata.output_dir, show_stdout=False, show_stderr=False, show_exit_code=False)
+        general_exec(metadata, dir=metadata.output_dir, show_stdout=True, show_stderr=True, show_exit_code=True)
 
     elif(g_is_sim_build_a_dir and g_is_sim_build_empty):
         print("Retrying compilation")
-        general_exec(dir=metadata.output_dir)
+        general_exec(metadata, dir=metadata.output_dir)
 
     elif(g_is_sim_build_a_dir and not g_is_sim_build_empty):
         print("Running")
-        general_exec(dir=metadata.output_dir, show_stdout=True, show_stderr=True, show_exit_code=True)
+        general_exec(metadata, dir=metadata.output_dir, show_stdout=True, show_stderr=True, show_exit_code=True)
 #=======================================================================================================
 # Entrypoint
 #=======================================================================================================
@@ -395,8 +407,12 @@ if __name__ == "__main__":
         gen_makefile(metadata)
     
         # Quartus project
-        U.print_dash_line()
-        handle_quartus(metadata)
+        if not g_ignore_quartus:
+            U.print_dash_line()
+            handle_quartus(metadata)
+
+        # Report
+        rep.report()
 
         U.print_dash_line()
         print(f"Done.")
@@ -404,16 +420,26 @@ if __name__ == "__main__":
 
     # Execute
     if g_execute:
+        # Template
+        if(g_reset_template):
+            U.print_dash_line()
+            gen_template(metadata)
+
         # Get duration
         start_time = time.time()
 
         U.print_dash_line()
-        execute()
+        execute(metadata)
 
         # Get duration
         end_time = time.time()
         duration = end_time - start_time
 
+        # Report
+        rep.report()
+
         U.print_dash_line()
         print(f"Done. Duration: {duration:.2f}s")
         U.print_dash_line()
+
+

@@ -26,6 +26,10 @@ class Metadata:
         DUT_OUTPUTS = 'DUT_outputs'
         QUARTUS_PROJECT_PATH = 'quartus_project_path'
         SYNTHESIZABILITY_COMMAND = 'synthesizability_command'
+        TEST_ERROR_PATTERN = 'test_error'
+        TEST_WARNING_PATTERN = 'test_warning'
+        GENERAL_ERROR_PATTERN = 'general_error'
+        GENERAL_WARNING_PATTERN = 'general_warning'
 
 
     class Template_types(Enum):
@@ -47,6 +51,13 @@ class Metadata:
         self.DUT_outputs = self._get_required_key(dictionary, self.Keys.DUT_OUTPUTS.value)
         self.quartus_project_path = dictionary.get(Metadata.Keys.QUARTUS_PROJECT_PATH.value)
         self.synthesizability_command = dictionary.get(Metadata.Keys.SYNTHESIZABILITY_COMMAND.value)
+
+        self.test_error_pattern = dictionary.get(Metadata.Keys.TEST_ERROR_PATTERN.value)
+        self.test_warning_pattern = dictionary.get(Metadata.Keys.TEST_WARNING_PATTERN.value)
+        self.general_error_pattern = dictionary.get(Metadata.Keys.GENERAL_ERROR_PATTERN.value)
+        self.general_warning_pattern = dictionary.get(Metadata.Keys.GENERAL_WARNING_PATTERN.value)
+    
+
 
         if self.is_valid_key(dictionary, self.Keys.VSAID.value):
             d_list = dictionary[self.Keys.VSAID.value]

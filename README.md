@@ -1,130 +1,189 @@
-# Autococo (Automatic cocotb based hardware testbench generator tool)
-
-
-
+# Autococo: Automatic cocotb-based Hardware Testbench Generator Tool
 
 ## Overview
-
-This tool automates the creation of testbenches for hardware modules written in SystemVerilog (`.sv`), using cocotb as the test framework. It supports running simulations using **Verilator** or **Questa**, generating the necessary cocotb template and Makefile. The tool simplifies the testing workflow by automatically configuring the simulator, handling testbench creation, and managing file paths.
-
-
-
+Autococo streamlines the testing of hardware modules written in SystemVerilog (`.sv`) by automating the creation of cocotb-based testbenches. Supporting **Verilator** and **Questa**, this tool generates the necessary cocotb template and Makefile, configures the simulator, and manages file paths. Autococo simplifies testbench setup, enabling seamless simulation and testing.
 
 ## Features
-
-- **Automatic Testbench Creation**: Generates cocotb testbenches for SystemVerilog files based on metadata provided in a YAML file.
-- **Simulator Integration**: Supports both **Verilator** and **Questa** simulators for running the generated testbenches.
-- **Customizable Inputs and Outputs**: You can specify the inputs, outputs, clocks, and resets of the DUT (Device Under Test) through the YAML configuration.
-- **Makefile Generation**: Creates a Makefile that runs the cocotb testbench with the selected simulator.
-- **Cross-Platform Support**: Works on both Linux (Ubuntu) and Windows environments.
-
-
-
+- **Automatic Testbench Creation**: Generates cocotb testbenches based on metadata from a YAML file.
+- **Simulator Compatibility**: Supports **Verilator** and **Questa** simulators.
+- **Customizable Interface**: Specify DUT inputs, outputs, clocks, and resets via YAML.
+- **Makefile Generation**: Automatically creates a Makefile for running cocotb testbenches.
+- **Cross-Platform Support**: Compatible with both Linux (Ubuntu) and Windows.
 
 ## Setup
 
 ### 1. Prerequisites
-Make sure the following dependencies are installed:
+Ensure the following dependencies are installed:
 
-#### For **Windows**, install:
+#### Windows Requirements
 - **Python 3.x**
-- **PyYAML**: Install by running `pip install pyyaml`
-- **Jinja**: Install by running `pip install jinja2`
+- **PyYAML**: Install with `pip install pyyaml`
+- **Jinja2**: Install with `pip install jinja2`
 - **WSL (Windows Subsystem for Linux)**
-##### On WSL, install
-- **cocotb**: Install by running `pip install cocotb`
-- **Verilator** and/or **Questa**, depending on your needs.
-- A functional **C++** compiler for use with Verilator.
-- Set the script policy in PowerShell by running
-`Set-ExecutionPolicy -ExecutionPolicy Bypass`
+  
+##### In WSL:
+- **cocotb**: `pip install cocotb`
+- **Verilator** and/or **Questa**
+- **C++ compiler** for Verilator
+- PowerShell Execution Policy: Run `Set-ExecutionPolicy -ExecutionPolicy Bypass`
+- Graphviz: `apt-get install python3 graphviz`
 
+#### Ubuntu Requirements
+1. **Install cocotb**: 
+   ```bash
+   pip3 install cocotb
+   ```
+2. **Verify Installation**:
+   ```bash
+   pip3 show cocotb
+   cocotb-config --version
+   ```
+   If `cocotb-config` is not found, update the PATH in `.bashrc`:
+   ```bash
+   nano ~/.bashrc
+   export PATH=$PATH:/home/"user"/.local/bin
+   source ~/.bashrc
+   ```
+   
+3. **Install Verilator (5.022 or higher)**:
+   ```bash
+   sudo apt-get install git make autoconf g++ flex bison libfl-dev libgoogle-perftools-dev numactl perl python3 help2man
+   git clone https://github.com/verilator/verilator
+   cd verilator
+   git checkout v5.028
+   autoconf
+   ./configure
+   make -j$(nproc)
+   make test
+   sudo make install
+   ```
 
+4. **Update PATH**:
+   ```bash
+   export PATH=$PATH:/usr/local/bin
+   source ~/.bashrc
+   verilator --version
+   ```
 
-#### For Ubuntu
-
-##### Install cocotb (1.9.1 or 1.9.0) by running
-
-`pip3 install cocotb`
-###### Verify Installation
-`pip3 show cocotb`
-###### Check if cocotb can be called
-`cocotb-config --version`
-###### If not, verify PATH. Edit the file .bashrc
-`nano ~/.bashrc`
-###### Add the following line:
-export PATH=$PATH:/home/"user"/.local/bin
-###### Apply changes for .bashrc
-`source ~/.bashrc`
-
-
-##### Install Verilator (only 5.022 or higher)
-###### 1. Install dependencies
-`sudo apt-get install git make autoconf g++ flex bison libfl-dev libgoogle-perftools-dev numactl perl python3`
-###### 2. Install help2man
-`sudo apt-get install help2man`
-###### 3. Clone Verilator
+#### Questa Intel FPGA Starter Edition Setup on WSL
+To ensure a stable MAC address, set the `wantmac` variable in `.bashrc`:
 ```bash
-git clone https://github.com/verilator/verilator
-cd verilator
-git checkout v5.028
-```
-###### Configure and install Verilator
-```bash
-autoconf
-./configure
-make -j$(nproc)
-make test
-sudo make install
-```
-###### This will place it here:
-/usr/local/bin/verilator
-###### Verify Installation
-`ls /usr/local/bin/verilator`
-###### However, when calling it, it looks for it here
-/usr/bin/verilator
-###### 4. Add to PATH. Add the next line to the file .bashrc and then apply changes
-export PATH=$PATH:/usr/local/bin
-###### Verify installation
-`verilator --version`
-
-
-
-##### For Questa Intel FPGA Starter Edition used in Windows WSL
-Make sure your WSL mac address is always the same that the one in the license.dat. For this set the variable 'wantmac' in /root/.bashrc by adding.
-
-```
 wantmac=xx:xx:xx:xx:xx:xx
 mac=$(ip link show eth0 | awk '/ether/ {print $2}')
-if [[ $mac !=  $wantmac ]]; then
+if [[ $mac != $wantmac ]]; then
     sudo ip link set dev eth0 down
     sudo ip link set dev eth0 address $wantmac
     sudo ip link set dev eth0 up
 fi
 ```
 
-
-### 2. Installation
-
-Clone the repository and install the required Python packages.
-
+#### Profiling Setup
+Install `graphviz` for profiling visualizations:
 ```bash
-git clone https://github.com/MajinLoop/PDD_S2_2024.git
-cd <your-repo-directory>
+pip install gprof2dot
+apt-get install python3 graphviz
 ```
 
+### 2. Installation
+Clone the repository and install dependencies:
+```bash
+git clone https://github.com/MajinLoop/PDD_S2_2024.git
+cd PDD_S2_2024/src
+```
 
+Here’s the updated **Usage** section with Windows instructions added:
 
+---
 
 ## Usage
-### For windows
-1. Open PowerShell in the `src` directory.
-2. Execute the command: `python .\cmd_controller.py path\to\yaml_file.yaml <flag>`.
-3. If uses `-r` resets the template.
-4. This will generate a folder in the location specified in the YAML file, indicated by the key "output_dir".
-5. No using flags result in
 
+To use this tool, adjust the YAML configuration file to specify details about your hardware module and desired test environment. Below is a description of the main YAML keys and instructions on how to configure them to customize the process:
 
-## Notes
+### 1. **output_dir**
+   - Defines the directory where all output files, including the testbench and Makefile, will be generated.
+   - **Example**: `output_dir: out`
 
-In verilator, input values not defined will be assumed as `0`.
-In Questa Intel FPGA Starter Edition, input values must be explicitly defined; otherwise, they will be assumed as `x`
+### 2. **template_type**
+   - Select the type of test architecture. Use `'simple'` for a direct assertion-based test or `'structured'` for a more comprehensive architecture that includes components like scoreboard, checker, and monitor.
+   - **Example**: `template_type: structured`
+
+### 3. **verilog_sources_and_include_dirs**
+   - Specify the Verilog files and include directories needed by the simulator:
+      - **verilog_sources**: List specific Verilog files.
+      - **load_all_from**: Load all Verilog files from the specified directories.
+   - **Example**:
+     ```yaml
+     verilog_sources_and_include_dirs:
+       - verilog_sources:
+         - specific_files:
+           - load_all_from:
+               - /path/to/directory1
+               - /path/to/directory2
+     ```
+
+### 4. **simulator**
+   - Specify the simulator to use for testing. Options: `'verilator'` or `'questa'`.
+   - **Example**: `simulator: questa`
+
+### 5. **timescale_timeprecision**
+   - Defines the timescale and precision for the simulation. 
+   - **Example**: `timescale_timeprecision: 1ns/1ps`
+
+### 6. **DUT_name**
+   - Names the Verilog module to be tested, without the `.sv` extension.
+   - **Example**: `DUT_name: ALU_RV32I`
+
+### 7. **template_name**
+   - Specifies the name of the template the tool will use for the testbench.
+   - **Example**: `template_name: tbs`
+
+### 8. **DUT_inputs and DUT_outputs**
+   - Define the **inputs** and **outputs** of the DUT:
+      - **clocks** and **resets**: If your DUT requires clock or reset signals, define them in these lists.
+      - List other input and output signals directly.
+   - **Example**:
+     ```yaml
+     DUT_inputs:
+       - clocks:
+           - clk
+       - resets:
+           - rst
+       - op
+       - a  
+       - b
+     DUT_outputs:
+       - o
+     ```
+
+### 9. **Error and Warning Messages**
+   - Customize error and warning detection during the simulation using regular expressions.
+   - **Example**:
+     ```yaml
+     error: (?i).*error.*
+     warning: (?i).*warning.*
+     ```
+
+### 10. **quartus_project_path** (Optional)
+   - If you are working with Quartus, provide the project path to facilitate synthesizability verification.
+   - **Example**: `quartus_project_path: D:\path\to\quartus\project`
+
+### 11. **synthesizability_command** (Optional)
+   - Command used for synthesizability verification of the module.
+   - **Example**: `synthesizability_command: quartus_sh --flow compile Logic_Circuit_Main`
+
+### Instructions
+1. Open PowerShell/Terminal in the `src` directory.
+2. Run the following command:
+   ```bash
+   python .\cmd_controller.py path\to\yaml_file.yaml <flag>
+   ```
+   - If you run the command without any flags, the tool generates the template, the Makefile, and checks Quartus synthesizability.
+   - Use the `-e` flag to execute the generated testbench template.
+   - Use the `-r` flag to reset the template to its original state.
+   - Use the `-i` flag to skip the Quartus synthesizability check.
+
+3. **Output Generation**: The tool generates output files in the directory specified by the `output_dir` key in the YAML file.
+
+### Notes
+- **Verilator** assumes undefined input values as `0`.
+- **Questa Intel FPGA Starter Edition** assumes undefined input values as `x`.

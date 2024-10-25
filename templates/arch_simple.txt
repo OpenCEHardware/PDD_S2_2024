@@ -45,6 +45,34 @@ async def tb_{{DUT_name}}(dut):
 
     # Print example
     logger.info("Hello world")
+
+
+@cocotb.test()
+async def tb_{{DUT_name}}_basic_stimulus(dut):
+    await Timer(100, units='{{timescale_unit}}')
+    expected_output = 1
+
+{{setup_clocks_section}}
+{{setup_resets_section}}
+
+    dut.{{some_DUT_input}}.value = 1	# Estímulo básico
+    await Timer(10, units='{{timescale_unit}}')
+
+    assert dut.{{some_DUT_output}}.value == expected_output, f"Error: DUT out {{some_DUT_output}}={dut.{{some_DUT_output}}.value}, expected {expected_output}"
+
+
+@cocotb.test()
+async def tb_{{DUT_name}}_random_stimulus(dut):
+    await Timer(100, units='{{timescale_unit}}')
+
+{{setup_clocks_section}}
+{{setup_resets_section}}
+
+    for _ in range(10):  # 10 iteraciones con estímulos aleatorios
+        random_value = random.randint(0, 15)
+        dut.{{some_DUT_input}}.value = random_value
+        await Timer(10, units='{{timescale_unit}}')
+        logger.info(f"Random Stimulus: {{some_DUT_input}}={random_value}")
 {{structure_example_section}}
 {{secuential_functions_header_section}}
 {{clocks_functions_section}}

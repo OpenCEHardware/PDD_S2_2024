@@ -2,18 +2,19 @@
 # hardware verification workflow using Verilog sources. It is used by a tool 
 # to automatically generate the required files, set up the simulator, and 
 # execute test cases for the specified Device Under Test (DUT). 
-#
+
+
+
 # Output directory where files will be generated. Do not start with '/' 
 # to avoid being interpreted as an absolute path on Unix systems.
 output_dir: out
-# output_dir: C:\Users\aleja\Documents\Arduino
 
 # Template type specifies the type of test architecture used for verification. 
 # Options are 'simple' for a direct assertion-based approach or 'structured' 
 # for a more comprehensive architecture that includes components like scoreboard, 
 # checker, and monitor for detailed validation.
-# template_type: simple
-template_type: structured
+template_type: simple
+# template_type: structured
 
 # Module and dependencies
 # Section to define Verilog sources and their include directories (use absolute paths).
@@ -70,12 +71,16 @@ DUT_inputs:
 DUT_outputs:
   - o
 
-# Optional key
-quartus_project_path:
-# quartus_project_path: D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu
+test_error: (?i)error
+test_warning: (?i)warning
+general_error: (?i)error
+general_warning: (?i)warning
 
+# Optional key
+# quartus_project_path:
+quartus_project_path: D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu
+
+# Optional key
 # Define the command for synthesizability verification of the module.
-# Ensure that the command is valid and that the execution environment
-# has access to the necessary tools.
 synthesizability_command: quartus_sh --flow compile Logic_Circuit_Main
 # synthesizability_command:

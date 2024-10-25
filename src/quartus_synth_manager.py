@@ -8,6 +8,7 @@ import sys
 
 import yaml_reader as yr
 import Utils as U
+import reporter as rep
 #=======================================================================================================
 # Defs
 #=======================================================================================================
@@ -87,15 +88,16 @@ def run_quartus_compile(metadata: yr.Metadata ,project_path, qpf_file_name):
 
     try:
     
-        subprocess.run(command, cwd=project_path, check=True, shell=True)
+        result = subprocess.run(command, cwd=project_path, check=True, shell=True, capture_output=True, text=True)
+        rep.log(metadata, result=result, source=rep.Sources.QUARTUS)
 
         U.print_dash_line()
-        print("Synthesis completed successfully.")
+        print("Quartus command completed successfully.")
 
     except subprocess.CalledProcessError as e:
 
         U.print_dash_line()
-        print(f"Error executing synthesis: {e}")
+        print(f"Error executing Quartus command: {e}")
 
 
 def restore_qsf(qsf_filepath):

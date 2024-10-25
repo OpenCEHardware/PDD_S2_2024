@@ -104,7 +104,17 @@ ifeq ($(VERBOSE),1)
 	@echo "COCOTB_HDL_TIMEPRECISION: $(COCOTB_HDL_TIMEPRECISION)"
 endif
 
-include $(shell cocotb-config --makefiles)/Makefile.sim"""
+include $(shell cocotb-config --makefiles)/Makefile.sim
+
+# Profiling
+SIM_ARGS += -fprofile+perf
+DOT_BINARY ?= dot
+test_profile.pstat: sim
+callgraph.svg: test_profile.pstat
+	$(shell cocotb-config --python-bin) -m gprof2dot -f pstats ./$< | $(DOT_BINARY) -Tsvg -o $@
+.PHONY: profile
+profile:
+	COCOTB_ENABLE_PROFILING=1 $(MAKE) callgraph.svg"""
 
     template_instance = Template(template)
 

@@ -34,7 +34,7 @@ g_TEMPLATE_STRUCTURE_OPTION_0 = '..\\templates\\structure_example_1.txt'
 # Output dirs
 g_output_dir = ""
 g_sim_build_dir = "sim_build"
-g_quartus_dir = "quartus_p"
+g_reports_dir = "reports"
 #=======================================================================================================
 # Defs
 #=======================================================================================================
@@ -87,10 +87,10 @@ def file_exists(file_name, dir):
 
 
 def set_output_dirs_from_metadata(metadata):
-    global g_output_dir, g_sim_build_dir, g_quartus_dir
+    global g_output_dir, g_sim_build_dir, g_reports_dir
     g_output_dir = metadata.output_dir
     g_sim_build_dir = os.path.join(g_output_dir, g_sim_build_dir)
-    g_quartus_dir = os.path.join(g_output_dir, g_quartus_dir)
+    g_reports_dir = os.path.join(g_output_dir, g_reports_dir)
 
 
 def write_to_txt(file_path, content):
@@ -166,3 +166,7 @@ def find_sv_files(paths: list) -> list:
 def print_dash_line(char='-'):
     columns, _ = shutil.get_terminal_size()
     print(char * (columns - 1))
+
+def get_dash_line(char='-') -> str:
+    columns, _ = shutil.get_terminal_size()
+    return char * (columns - 1)
