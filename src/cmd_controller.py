@@ -15,8 +15,6 @@ import makefile_generator as mg
 import quartus_synth_manager as qsm
 import Utils as U
 import reporter as rep
-
-# https://docs.cocotb.org/en/stable/building.html#envvar-COCOTB_ENABLE_PROFILING
 #=======================================================================================================
 # Globals
 #=======================================================================================================
@@ -233,6 +231,7 @@ def convert_command_to_PS_WSL(command):
 
 
 def exec_terminal(command):
+    command = ["make", "profile"]
     return subprocess.run(command, check=True, text=True, capture_output=True)
 
 
