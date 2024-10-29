@@ -231,11 +231,36 @@ def convert_command_to_PS_WSL(command):
 
 
 def exec_terminal(command):
+    """
+    Executes a terminal command using the subprocess module.
+
+    This function runs the specified command in the terminal and captures the output. 
+    The command defaults to 'make profile'.
+
+    Args:
+        command (list): A list of command-line arguments to be executed.
+
+    Returns:
+        subprocess.CompletedProcess: The completed process instance containing 
+        the output and return code of the command.
+    """
     command = ["make", "profile"]
     return subprocess.run(command, check=True, text=True, capture_output=True)
 
 
 def cmd_parser():
+    """
+    Parses command-line arguments for the tool.
+
+    This function sets up an argument parser to read command-line options 
+    and populates global variables based on the parsed arguments.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     global g_yaml_path, g_reset_template, g_execute, g_ignore_quartus
     parser = argparse.ArgumentParser(description="Tool entrypoint.")
 
@@ -287,6 +312,18 @@ def cmd_parser():
 
 
 def get_output_dir_status():
+    """
+    Checks the status of the output directory.
+
+    This function verifies if the output directory exists and whether it is empty. 
+    It sets global variables to reflect these statuses.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     global g_is_output_a_dir, g_is_output_empty
     g_is_output_a_dir = Path(U.g_output_dir).is_dir()
     if(g_is_output_a_dir):
@@ -294,6 +331,18 @@ def get_output_dir_status():
 
 
 def get_sim_build_dir_status():
+    """
+    Checks the status of the simulation build directory.
+
+    This function verifies if the simulation build directory exists and whether it is empty. 
+    It sets global variables to reflect these statuses.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     global g_is_sim_build_a_dir, g_is_sim_build_empty
     g_is_sim_build_a_dir = Path(U.g_sim_build_dir).is_dir()
     if(g_is_sim_build_a_dir):
@@ -301,16 +350,52 @@ def get_sim_build_dir_status():
 
 
 def get_template_status():
+    """
+    Checks if the template file exists.
+
+    This function verifies if the template file exists in the output directory. 
+    It sets a global variable to reflect the existence of the template.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     global g_exists_template 
     g_exists_template = U.file_exists(file_name=metadata.template_name+".py", dir=U.g_output_dir)
 
 
 def get_makefile_status():
+    """
+    Checks if the Makefile exists in the output directory.
+
+    This function verifies if the Makefile exists in the output directory. 
+    It sets a global variable to reflect the existence of the Makefile.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     global g_exists_makefile
     g_exists_makefile = U.file_exists("Makefile", dir=U.g_output_dir)
 
 
 def get_simulator_status(metadata: yr.Metadata):
+    """
+    Retrieves and normalizes the simulator status from metadata.
+
+    This function extracts the simulator name from the metadata and ensures 
+    it is in a standardized format (capitalization).
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing the simulator information.
+    
+    Returns:
+        None
+    """
     global g_simulator
     g_simulator = metadata.simulator.lower()
     if(g_simulator == U.SIM.VERILATOR.value.lower()):
@@ -320,6 +405,18 @@ def get_simulator_status(metadata: yr.Metadata):
 
 
 def check_simulator_change(metadata: yr.Metadata):
+    """
+    Checks if the simulator has changed and cleans up output if necessary.
+
+    This function compares the current simulator with a previously recorded 
+    simulator and clears the output directory if they differ.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing the simulator information.
+    
+    Returns:
+        None
+    """
     previous_simulator = U.read_from_txt(TXT_TO_KNOW_PREVIOUS_SIMULATOR)
     U.write_to_txt(TXT_TO_KNOW_PREVIOUS_SIMULATOR, g_simulator)
     if(previous_simulator != g_simulator):
@@ -327,6 +424,18 @@ def check_simulator_change(metadata: yr.Metadata):
 
 
 def gen_template(metadata: yr.Metadata):
+    """
+    Generates a new template if necessary.
+
+    This function checks if a template exists and generates a new one 
+    if it does not exist or if the reset option is specified.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT information.
+    
+    Returns:
+        None
+    """
     get_template_status()
     if(g_exists_template):
         if(g_reset_template):
@@ -337,12 +446,35 @@ def gen_template(metadata: yr.Metadata):
         tg.gen_template(metadata)
 
 
-def gen_makefile(metadata: yr.Metadata):
+def gen_makefile(metadata: yr.Metadata, compile = True):
+    """
+    Generates a Makefile based on the provided metadata.
+
+    This function checks if a Makefile already exists and generates a new one.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT information.
+    
+    Returns:
+        None
+    """
     get_makefile_status()
-    mg.gen_makefile(metadata)
+    mg.gen_makefile(metadata, compile)
 
 
 def handle_quartus(metadata: yr.Metadata):
+    """
+    Checks the status of the Quartus project directory.
+
+    This function verifies if the Quartus project directory exists and whether it is empty. 
+    It prints a warning if the project directory does not exist or is empty.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing Quartus project path.
+    
+    Returns:
+        None
+    """
     global g_is_quartus_p_a_dir, g_is_quartus_p_empty
 
     # Check dir and dir emptyness
@@ -361,6 +493,19 @@ def handle_quartus(metadata: yr.Metadata):
 
 
 def execute(metadata: yr.Metadata):
+    """
+    Executes the simulation based on the current state of the build directory.
+
+    This function compiles and runs the simulation if the build directory does not exist. 
+    It retries compilation if the build directory exists but is empty, 
+    or runs the simulation if the build directory is not empty.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT information.
+
+    Returns:
+        None
+    """
     # Execute
     if(not g_is_sim_build_a_dir):
         print("Compiling and running")
@@ -394,6 +539,7 @@ if __name__ == "__main__":
     get_simulator_status(metadata)
     check_simulator_change(metadata) # Clears dir if the sim changes (except the template)
     get_sim_build_dir_status()
+    get_makefile_status()
 
     # Preparation
     if not g_execute:
@@ -419,6 +565,12 @@ if __name__ == "__main__":
 
     # Execute
     if g_execute:
+        if not g_is_output_a_dir or g_is_output_empty:
+            print("There are no files in the yaml 'output_dir'")
+        if not g_exists_makefile:
+            print("There is no Makefile in the yaml 'output_dir'")
+            sys.exit()
+
         # Template
         if(g_reset_template):
             U.print_dash_line()

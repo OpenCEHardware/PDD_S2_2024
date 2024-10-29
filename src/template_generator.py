@@ -74,24 +74,80 @@ async def get_output(dut, packet):
 
 
 def has_inputs(metadata: yr.Metadata) -> bool:
+    """
+    Checks if the provided metadata has any inputs defined.
+
+    This function attempts to access the third element of the DUT_inputs list 
+    in the metadata. If it exists and is not None, the function returns True. 
+    If there is an IndexError or KeyError, it returns False.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT inputs information.
+
+    Returns:
+        bool: True if inputs are defined; otherwise, False.
+    """
     try:
         return (metadata.DUT_inputs[2] is not None)
     except (IndexError, KeyError):
         return False
 
+
 def has_outputs(metadata: yr.Metadata) -> bool:
+    """
+    Checks if the provided metadata has any outputs defined.
+
+    This function attempts to access the first element of the DUT_outputs list 
+    in the metadata. If it exists and is not None, the function returns True. 
+    If there is an IndexError or KeyError, it returns False.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT outputs information.
+
+    Returns:
+        bool: True if outputs are defined; otherwise, False.
+    """
     try:
         return (metadata.DUT_outputs[0] is not None)
     except (IndexError, KeyError):
         return False
 
+
 def has_clocks(metadata: yr.Metadata) -> bool:
+    """
+    Checks if the provided metadata has any clock signals defined.
+
+    This function attempts to access the clock signals in the first element 
+    of the DUT_inputs list using the CLOCKS key from the Keys enumeration. 
+    If it exists and is not None, the function returns True. 
+    If there is an IndexError or KeyError, it returns False.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT input information.
+
+    Returns:
+        bool: True if clock signals are defined; otherwise, False.
+    """
     try:
         return (metadata.DUT_inputs[0][metadata.Keys.CLOCKS.value] is not None)
     except (IndexError, KeyError):
         return False
 
+
 def get_initiate_clocks_section(metadata: yr.Metadata) -> str:
+    """
+    Generates a section of code to initiate clock signals based on the provided metadata.
+
+    This function retrieves the clock names from the DUT_inputs of the metadata. 
+    If there is one clock, it generates a line to start that clock. If there are 
+    multiple clocks, it generates a list of clocks and a line to start all of them.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT input information.
+
+    Returns:
+        str: The generated code section for initiating clocks.
+    """
     clocks_names_list = metadata.DUT_inputs[0][metadata.Keys.CLOCKS.value]
     
     if(len(clocks_names_list) == 1):
@@ -113,13 +169,40 @@ def get_initiate_clocks_section(metadata: yr.Metadata) -> str:
 
     return template_section
 
+
 def has_resets(metadata: yr.Metadata) -> bool:
+    """
+    Checks if the provided metadata has any reset signals defined.
+
+    This function attempts to access the resets defined in the DUT_inputs of the 
+    metadata. If the resets list exists and is not None, it returns True. If 
+    there is an IndexError or KeyError, it returns False.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT input information.
+
+    Returns:
+        bool: True if resets are defined; otherwise, False.
+    """
     try:
         return (metadata.DUT_inputs[1][metadata.Keys.RESETS.value] is not None)
     except (IndexError, KeyError):
         return False
 
 def get_handle_resets_section(metadata: yr.Metadata) -> str:
+    """
+    Generates a section of code to handle reset signals based on the provided metadata.
+
+    This function retrieves the reset names from the DUT_inputs of the metadata. 
+    If there is one reset, it generates a line to reset that signal. If there are 
+    multiple resets, it generates a list of resets and a line to reset all of them.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT input information.
+
+    Returns:
+        str: The generated code section for handling resets.
+    """
     resets_names_list = metadata.DUT_inputs[1][metadata.Keys.RESETS.value]
     
     if(len(resets_names_list) == 1):
@@ -143,6 +226,20 @@ def get_handle_resets_section(metadata: yr.Metadata) -> str:
 
 
 def generate_jinja_template(metadata: yr.Metadata) -> str:
+    """
+    Generates a Jinja template string based on the provided metadata.
+
+    This function constructs a template for testing a hardware design under test (DUT)
+    by checking the existence of clocks, resets, inputs, and outputs in the metadata. 
+    It includes sections for setting up clocks and resets, as well as generating 
+    function headers and examples based on the template type specified in the metadata.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT information and configuration.
+
+    Returns:
+        str: The rendered Jinja template string for the DUT test.
+    """
     has_clocks_ = has_clocks(metadata)
     has_resets_ = has_resets(metadata)
     has_inputs_ = has_inputs(metadata)
@@ -222,13 +319,34 @@ def generate_jinja_template(metadata: yr.Metadata) -> str:
     rendered_str = template_instance.render(context)
     return rendered_str
 
+
 def write_template(filename, rendered_str, directory):
-    """Writes the python test template."""
+    """
+    Writes a rendered template string to a specified file.
+
+    This function creates a file with the specified filename in the given directory 
+    and writes the rendered template string to it.
+
+    Args:
+        filename (str): The name of the file to write the template to.
+        rendered_str (str): The rendered template string to write to the file.
+        directory (str): The directory where the file will be created.
+    """
     filepath = os.path.join(directory, filename)
     with open(filepath, 'w') as file:
         file.write(rendered_str)
 
+
 def gen_template(metadata: yr.Metadata):
+    """
+    Generates and writes a test template for the DUT.
+
+    This function generates a Jinja template string using the provided metadata,
+    then writes it to a file named after the template_name specified in the metadata.
+
+    Args:
+        metadata (yr.Metadata): The metadata object containing DUT information and output directory.
+    """
     print("Generating template")
     rendered_str = generate_jinja_template(metadata)
     write_template(f"{metadata.template_name}.py", rendered_str, directory=metadata.output_dir)

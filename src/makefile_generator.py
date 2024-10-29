@@ -1,6 +1,6 @@
-"""
-This module generates makefiles.
-"""
+#=======================================================================================================
+# Imports
+#=======================================================================================================
 import os
 import yaml
 from jinja2 import Template
@@ -9,14 +9,24 @@ from enum import Enum
 
 import yaml_reader as yr
 import Utils as U
-
+#=======================================================================================================
+# Globals
+#=======================================================================================================
 g_LICENSES_SECTION = """# This file is public domain, it can be freely copied without restrictions.
 # SPDX-License-Identifier: CC0-1.0"""
-
-
-
-
+#=======================================================================================================
+# Defs
+#=======================================================================================================
 def gen_verilog_sources(metadata: yr.Metadata) -> str:
+    """
+    Generate the Verilog source files section of the Makefile.
+
+    Args:
+        metadata (yr.Metadata): Metadata containing path information.
+    
+    Returns:
+        str: Formatted string for Verilog sources.
+    """
     template_section = ""
     plus = ""
 
@@ -56,6 +66,15 @@ def gen_verilog_sources(metadata: yr.Metadata) -> str:
 
 
 def gen_verilog_includes(metadata: yr.Metadata) -> str:
+    """
+    Generate the Verilog include directories section of the Makefile.
+
+    Args:
+        metadata (yr.Metadata): Metadata containing path information.
+    
+    Returns:
+        str: Formatted string for Verilog include directories.
+    """
     template_section = ""
 
     paths_matrix =  metadata.get_paths_matrix()
@@ -73,7 +92,16 @@ def gen_verilog_includes(metadata: yr.Metadata) -> str:
     return template_section
 
 
-def generate_jinja_template(metadata: yr.Metadata) -> str:
+def generate_jinja_template(metadata: yr.Metadata, compile: bool) -> str:
+    """
+    Generate a Jinja2 template for the Makefile.
+
+    Args:
+        metadata (yr.Metadata): Metadata containing configuration details.
+    
+    Returns:
+        str: Rendered Makefile template.
+    """
     template = g_LICENSES_SECTION + "\n\n"
 
     template +="""SIM = {{simulator}}
@@ -87,7 +115,11 @@ TOPLEVEL_LANG = verilog""" + "\n"
 MODULE = {{template_name}}
 COCOTB_HDL_TIMEUNIT = {{timescale}}
 COCOTB_HDL_TIMEPRECISION = {{timeprecision}}
-
+"""
+    # if compile:
+    #     template += "COMPILE_ARGS = --cc"
+    
+    template += """
 VERBOSE ?= 0
 
 all: print_vars sim
@@ -136,12 +168,25 @@ profile:
     return rendered_str
 
 def write_template(filename, rendered_str, directory):
-    """Writes the makefile."""
+    """
+    Write the rendered template string to a Makefile.
+
+    Args:
+        filename (str): Name of the output file.
+        rendered_str (str): The rendered template string.
+        directory (str): The directory to write the file to.
+    """
     filepath = os.path.join(directory, filename)
     with open(filepath, 'w') as file:
         file.write(rendered_str)
 
-def gen_makefile(metadata: yr.Metadata):
+def gen_makefile(metadata: yr.Metadata, compile: bool):
+    """
+    Generate the Makefile using the provided metadata.
+
+    Args:
+        metadata (yr.Metadata): Metadata for generating the Makefile.
+    """
     print("Generating Makefile")
-    rendered_str = generate_jinja_template(metadata)
+    rendered_str = generate_jinja_template(metadata, compile)
     write_template("Makefile", rendered_str, metadata.output_dir)

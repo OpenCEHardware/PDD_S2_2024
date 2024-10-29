@@ -13,7 +13,7 @@ class Sources(Enum):
     COCOTB      = "cocotb"
     SIM         = "sim"
 #=======================================================================================================
-# GLobals
+# Globals
 #=======================================================================================================
 QUARTUS_FILENAME = 'quartus_report.rpt'
 g_quartus_file_content = ''
@@ -37,6 +37,15 @@ NAME_PATTERN = r'[A-z0-9_]+'
 # Defs
 #=======================================================================================================
 def log(metadata: yr.Metadata, result, source: Sources):
+    """Logs the output of the tests based on the source.
+
+    Parameters:
+    - metadata: Metadata object containing error and warning patterns.
+    - result: Result object containing stdout, stderr, and return code.
+    - source: Enum source indicating the type of the source.
+
+    Populates global variables with the processed log data for Quartus and Cocotb tests.
+    """
     global g_quartus_file_content           \
     ,g_tests_error_file_content             \
     ,g_tests_warning_file_content           \
@@ -85,6 +94,16 @@ def log(metadata: yr.Metadata, result, source: Sources):
 
 
 def extract_tests_data(stdout, pattern, separator) -> str:
+    """Extracts test data based on a given pattern and separates results by test cases.
+
+    Parameters:
+    - stdout: The standard output of the executed test.
+    - pattern: Regex pattern to identify relevant data.
+    - separator: Line separator used for formatting.
+
+    Returns:
+    Formatted string with extracted test data for error or warning logs.
+    """
     result = ''
 
     test_start_pattern = re.compile(r"INFO\s+cocotb\.regression\s+running\s+(\S+)\s+\(\d+/\d+\)")
@@ -129,6 +148,16 @@ def extract_tests_data(stdout, pattern, separator) -> str:
 
 
 def extract(text, pattern, separator) -> str:
+    """Extracts lines matching a pattern from text.
+
+    Parameters:
+    - text: Text to search for matching lines.
+    - pattern: Regex pattern to match.
+    - separator: Line separator used for formatting.
+
+    Returns:
+    String with all matching lines, formatted with the separator.
+    """
     result = ''
 
     if pattern:
@@ -144,6 +173,13 @@ def extract(text, pattern, separator) -> str:
 
 
 def report():
+    """Generates report files based on the logged data for different types of test outputs.
+
+    Saves reports in a specified directory. Includes metadata such as timestamp and return codes.
+
+    Exceptions:
+    Handles OSError if files or directories cannot be created or written to.
+    """
     global g_quartus_file_content           \
     ,g_tests_error_file_content             \
     ,g_tests_warning_file_content           \

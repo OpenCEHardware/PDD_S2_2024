@@ -52,6 +52,19 @@ def find_quartus_project_names(project_path: str) -> tuple:
 
 
 def mod_qsf(metadata: yr.Metadata, qsf_filepath, top_level_entity: str):
+    """
+    Modifies the .qsf file to set the top-level entity and add source file paths.
+    
+    This function opens the specified .qsf file, sets the 'TOP_LEVEL_ENTITY' to the 
+    provided entity name, and appends the paths of all SystemVerilog files needed 
+    for synthesis as source files. If the 'TOP_LEVEL_ENTITY' assignment does not 
+    exist, it is added at the end of the file.
+    
+    Args:
+        metadata (yr.Metadata): Metadata object containing the necessary paths for synthesis.
+        qsf_filepath (str): Path to the .qsf file to be modified.
+        top_level_entity (str): Name of the top-level entity to assign in the .qsf file.
+    """
     with open(qsf_filepath, 'r') as file:
         lines = file.readlines()
 
@@ -77,7 +90,21 @@ def mod_qsf(metadata: yr.Metadata, qsf_filepath, top_level_entity: str):
 
 
 def run_quartus_compile(metadata: yr.Metadata ,project_path, qpf_file_name):
+    """
+    Runs the Quartus compile command for a given project.
 
+    This function executes the Quartus command to compile the specified project, 
+    logging output and errors as appropriate. The command is executed in the specified 
+    project directory, and results are stored in the log file.
+
+    Args:
+        metadata (yr.Metadata): Metadata object with synthesis command and reporting settings.
+        project_path (str): Path to the Quartus project directory.
+        qpf_file_name (str): Name of the .qpf file for the project to compile.
+
+    Raises:
+        subprocess.CalledProcessError: If the Quartus command fails during execution.
+    """
     if metadata.synthesizability_command:
         command = metadata.synthesizability_command
     else:
@@ -101,12 +128,32 @@ def run_quartus_compile(metadata: yr.Metadata ,project_path, qpf_file_name):
 
 
 def restore_qsf(qsf_filepath):
+    """
+    Restores the original .qsf file by copying from a backup.
+
+    This function restores the .qsf file to its original state by replacing the modified 
+    file with a backup copy (.bak file). It is intended to be used after synthesis to 
+    undo any modifications to the .qsf file.
+
+    Args:
+        qsf_filepath (str): Path to the .qsf file that was modified and needs restoration.
+    """
     shutil.copy(qsf_filepath + ".bak", qsf_filepath)
     # print("Archivo .qsf restaurado a su estado original.")
 
 
 def handle_quartus_synthesis(metadata: yr.Metadata):
+    """
+    Manages the complete Quartus synthesis process including file modification, compilation, and restoration.
 
+    This function executes the full synthesis process for a Quartus project. It finds the .qpf 
+    and .qsf project files, modifies the .qsf file with the required top-level entity and source 
+    files, runs the compilation command, and restores the original .qsf file afterward.
+
+    Args:
+        metadata (yr.Metadata): Metadata object containing the Quartus project path, top-level 
+                                entity name, and synthesis configuration.
+    """
     qpf_file_name, qsf_file_name = find_quartus_project_names(project_path=metadata.quartus_project_path)
     qsf_filepath = os.path.join(metadata.quartus_project_path, f"{qsf_file_name}.qsf")
     top_level_entity = metadata.DUT_name

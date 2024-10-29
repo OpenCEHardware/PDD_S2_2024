@@ -1,3 +1,6 @@
+#=======================================================================================================
+# Imports
+#=======================================================================================================
 import yaml
 import os
 import sys
@@ -5,9 +8,14 @@ import re
 from enum import Enum
 import Utils as U
 from pathlib import Path
-
-
+#=======================================================================================================
+# Defs
+#=======================================================================================================
 class Metadata:
+    """
+    Metadata class to manage and validate metadata keys, templates, and configuration data.
+    """
+
     class Keys(Enum):
         OUTPUT_DIR = 'output_dir'
         TEMPLATE_TYPE = "template_type"
@@ -38,6 +46,12 @@ class Metadata:
 
 
     def __init__(self, yaml):
+        """
+        Initializes the Metadata class with YAML data.
+
+        Args:
+            yaml (dict): Dictionary containing YAML configuration data.
+        """
         self.yaml = yaml
         dictionary = self.yaml
 
@@ -68,6 +82,20 @@ class Metadata:
 
 
     def _get_required_key(self, dictionary, key):
+        """
+        Helper to fetch required keys from the dictionary.
+
+        Args:
+            dictionary (dict): Dictionary from which to fetch the key.
+            key (str): Key to retrieve.
+
+        Raises:
+            KeyError: If the key is not found in the dictionary.
+            ValueError: If the key's value is invalid.
+
+        Returns:
+            Any: Value associated with the provided key.
+        """
         """Helper to fetch required keys."""
         if key not in dictionary:
             raise KeyError(f"yaml missing key: {key}")
@@ -77,12 +105,33 @@ class Metadata:
 
 
     def is_dict(self, d) -> bool:
+        """
+        Checks if a variable is a dictionary.
+
+        Args:
+            d (Any): Variable to check.
+
+        Raises:
+            TypeError: If `d` is not a dictionary.
+
+        Returns:
+            bool: True if `d` is a dictionary.
+        """
         if not isinstance(d, dict):
             raise TypeError(f"{d} must be a dictionary")
         return True
 
 
     def _parse_timescale(self, timescale_timeprecision):
+        """
+        Parse and validate the timescale and timeprecision format.
+
+        Args:
+            timescale_timeprecision (str): Timescale and timeprecision string.
+
+        Raises:
+            ValueError: If the timescale format is invalid.
+        """
         """Parse and validate the timescale and timeprecision."""
         pattern = r'(\d+)(\w+)/(\d+)(\w+)'
         match = re.search(pattern, timescale_timeprecision)
@@ -99,6 +148,16 @@ class Metadata:
 
 
     def _validate_vsaid_structure(self, d_list):
+        """
+        Ensure the verilog_sources_and_include_dirs structure is valid.
+
+        Args:
+            d_list (list): List to validate.
+
+        Raises:
+            ValueError: If the structure does not match expectations.
+            TypeError: If elements are not dictionaries.
+        """
         """Ensure the verilog_sources_and_include_dirs structure is valid."""
         if not isinstance(d_list, list) or len(d_list) != 2:
             raise ValueError(f"VSAID must be a list with 2 elements")
@@ -107,6 +166,9 @@ class Metadata:
 
 
     def _load_verilog_data(self):
+        """
+        Load Verilog sources and include directories from YAML data.
+        """
         """Load verilog sources and include directories."""
         verilog_data = self.yaml.get('verilog_sources_and_include_dirs', [])
         aux = [[],[],[],[]]
@@ -138,6 +200,20 @@ class Metadata:
         self.verilog_include_dirs_load_all_from = aux[3]
 
     def is_valid_key(self, d, k, nullable=False) -> bool:
+        """
+        Check if a key is valid and not None.
+
+        Args:
+            d (dict): Dictionary to check.
+            k (str): Key to validate.
+            nullable (bool, optional): If True, allows None values.
+
+        Raises:
+            ValueError: If key is missing or invalid.
+
+        Returns:
+            bool: True if the key is valid.
+        """
         """Check if a key is valid and not None."""
         if k not in d or (d[k] is None and not nullable):
             raise ValueError(f"key: {k} value is invalid")
@@ -145,14 +221,28 @@ class Metadata:
 
 
     def load_paths(self, d, k) -> list:
+        """
+        Load paths from a dictionary key, ensuring it's a list.
+
+        Args:
+            d (dict): Dictionary to search.
+            k (str): Key to load paths from.
+
+        Returns:
+            list: List of paths or empty list.
+        """
         if self.is_valid_key(d, k) and isinstance(d[k], list):
             return d[k]
         return []
 
 
     def verify_all_paths(self) -> bool:
-        """Verify the existence and validity of various paths."""
-        
+        """
+        Verify the existence and validity of various paths.
+
+        Returns:
+            bool: True if all paths are valid.
+        """        
         path = Path(self.output_dir)
         if not path.is_dir():
             path.mkdir(parents=True, exist_ok=True)
@@ -171,7 +261,17 @@ class Metadata:
 
 
     def _verify_path_list(self, path_list, file_check=False, dir_check=False):
-        """Verify a list of paths are either files or directories."""
+        """
+        Verify a list of paths are either files or directories.
+
+        Args:
+            path_list (list): List of paths to check.
+            file_check (bool, optional): Check paths as files if True.
+            dir_check (bool, optional): Check paths as directories if True.
+
+        Raises:
+            ValueError: If a path is invalid.
+        """
         try:
             for path in path_list:
                 path = Path(path)
@@ -200,6 +300,12 @@ class Metadata:
 
 
     def get_paths_matrix(self):
+        """
+        Retrieve a matrix of paths based on the operating system.
+
+        Returns:
+            List[List[str]]: Nested list of Verilog source and include paths, adjusted for WSL if on Windows.
+        """
         if(U.g_os_name == U.OS.WINDOWS.value):
             return self.get_converted_to_WSL_paths_matrix()
         else:
@@ -213,6 +319,12 @@ class Metadata:
 
 
     def get_converted_to_WSL_paths_matrix(self):
+        """
+        Convert Windows paths to WSL format.
+
+        Returns:
+            List[List[str]]: Matrix of converted paths for WSL.
+        """
         result = [[],[],[],[]]
         for i in range(len(self.verilog_sources_specific_files)):
             result[0].append(U.windows_to_wsl_path(self.verilog_sources_specific_files[i]))
@@ -229,6 +341,9 @@ class Metadata:
 
 
     def get_combined_path_list(self) -> list:
+        """
+        Display the metadata attributes in a formatted output.
+        """
         return self.verilog_sources_specific_files + self.verilog_sources_load_all_from + self.verilog_include_dirs_specific_files + self.verilog_include_dirs_load_all_from
 
 
@@ -250,6 +365,19 @@ class Metadata:
 
 
 def read_yaml(yaml_filepath):
+    """
+    Read a YAML file and return a Metadata instance.
+
+    Args:
+        yaml_filepath (str): Path to the YAML file.
+
+    Returns:
+        Metadata: Metadata object initialized with YAML data.
+
+    Raises:
+        FileNotFoundError: If the YAML file is not found.
+        ValueError: If the YAML data is not a dictionary.
+    """
     print("Reading YAML")
 
     yaml_dic = None
