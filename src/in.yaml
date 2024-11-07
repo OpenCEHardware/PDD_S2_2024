@@ -37,7 +37,7 @@ verilog_sources_and_include_dirs:
     # Section to specify individual include files.
     - specific_files:
 
-    # Directory to load all include files from the specified ptahs.
+    # Directory to load all include files from the specified paths.
     - load_all_from:
 
 # Simulator to be used for the simulation. Options are 'verilator' or 'questa'.

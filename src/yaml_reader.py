@@ -385,8 +385,10 @@ def read_yaml(yaml_filepath):
         with open(yaml_filepath, 'r') as file:
             yaml_dic = yaml.safe_load(file)
     except FileNotFoundError:
-        raise FileNotFoundError(f"The file {yaml_filepath} was not found.")
-    
+        print(f"Error: {e}")
+        sys.exit()
+
+
     if not isinstance(yaml_dic, dict):
         raise ValueError("yaml_dic must be a valid dictionary")
     

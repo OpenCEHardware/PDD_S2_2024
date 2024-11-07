@@ -15,20 +15,16 @@ Autococo streamlines the testing of hardware modules written in SystemVerilog (`
 ### 1. Prerequisites
 Ensure the following dependencies are installed:
 
-#### Windows Requirements
+#### Common OS Requirements
 - **Python 3.x**
 - **PyYAML**: Install with `pip install pyyaml`
 - **Jinja2**: Install with `pip install jinja2`
-- **WSL (Windows Subsystem for Linux)**
-  
-##### In WSL:
-- **cocotb**: `pip install cocotb`
-- **Verilator** and/or **Questa**
-- **C++ compiler** for Verilator
-- PowerShell Execution Policy: Run `Set-ExecutionPolicy -ExecutionPolicy Bypass`
-- Graphviz: `apt-get install python3 graphviz`
 
-#### Ubuntu Requirements
+#### Windows Requirements
+- **WSL (Windows Subsystem for Linux)**
+- **PowerShell Execution Policy**: Change Execution Policy to `bypass` with: `Set-ExecutionPolicy -ExecutionPolicy Bypass`
+
+#### Ubuntu/WSL Requirements
 1. **Install cocotb**: 
    ```bash
    pip3 install cocotb
@@ -91,10 +87,6 @@ git clone https://github.com/MajinLoop/PDD_S2_2024.git
 cd PDD_S2_2024/src
 ```
 
-Here’s the updated **Usage** section with Windows instructions added:
-
----
-
 ## Usage
 
 To use this tool, adjust the YAML configuration file to specify details about your hardware module and desired test environment. Below is a description of the main YAML keys and instructions on how to configure them to customize the process:
@@ -107,19 +99,34 @@ To use this tool, adjust the YAML configuration file to specify details about yo
    - Select the type of test architecture. Use `'simple'` for a direct assertion-based test or `'structured'` for a more comprehensive architecture that includes components like scoreboard, checker, and monitor.
    - **Example**: `template_type: structured`
 
-### 3. **verilog_sources_and_include_dirs**
+### 3. **Selecting files**
    - Specify the Verilog files and include directories needed by the simulator:
-      - **verilog_sources**: List specific Verilog files.
-      - **load_all_from**: Load all Verilog files from the specified directories.
+      - **verilog_sources**: Load SystemVerilog source files.
+      - **verilog_sources_and_include_dirs**: Load SystemVerilog header files.
    - **Example**:
-     ```yaml
-     verilog_sources_and_include_dirs:
-       - verilog_sources:
-         - specific_files:
-           - load_all_from:
-               - /path/to/directory1
-               - /path/to/directory2
-     ```
+   ```yaml
+   - verilog_sources:
+      - specific_files:
+         - /path/to/file_1.sv
+         - /path/to/file_2.sv
+         - /path/to/file_n.sv
+
+      - load_all_from:
+         - /path/to/directory_1
+         - /path/to/directory_2
+         - /path/to/directory_n
+
+   - verilog_include_dirs:
+      - specific_files:
+         - /path/to/file_1.svh
+         - /path/to/file_2.svh
+         - /path/to/file_n.svh
+
+      - load_all_from:
+         - /path/to/directory_1
+         - /path/to/directory_2
+         - /path/to/directory_n
+   ```
 
 ### 4. **simulator**
    - Specify the simulator to use for testing. Options: `'verilator'` or `'questa'`.
