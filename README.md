@@ -115,8 +115,10 @@ To use this tool, adjust the YAML configuration file to specify details about yo
          - /path/to/directory_1
          - /path/to/directory_2
          - /path/to/directory_n
-
+   # This feature 
    - verilog_include_dirs:
+      # Note: For .svh files the key `specific_files` is not functional yet.
+      # For now, use `load_all_from` to include all files within a directory.
       - specific_files:
          - /path/to/file_1.svh
          - /path/to/file_2.svh
@@ -127,6 +129,9 @@ To use this tool, adjust the YAML configuration file to specify details about yo
          - /path/to/directory_2
          - /path/to/directory_n
    ```
+   Note: For .svh files the key `specific_files` is not functional yet.
+   For now, use `load_all_from` to include all files within a directory.
+
 
 ### 4. **simulator**
    - Specify the simulator to use for testing. Options: `'verilator'` or `'questa'`.

@@ -3,6 +3,8 @@
 # to automatically generate the required files, set up the simulator, and 
 # execute test cases for the specified Device Under Test (DUT). 
 
+
+
 # Output directory where files will be generated. Do not start with '/' 
 # to avoid being interpreted as an absolute path on Unix systems.
 output_dir: out
@@ -12,6 +14,7 @@ output_dir: out
 # for a more comprehensive architecture that includes components like scoreboard, 
 # checker, and monitor for detailed validation.
 template_type: simple
+# template_type: structured
 
 # Module and dependencies
 # Section to define Verilog sources and their include directories (use absolute paths).
@@ -20,67 +23,53 @@ verilog_sources_and_include_dirs:
   - verilog_sources:
     # Section to specify individual Verilog files.
     - specific_files:
-      - /path/to/file_1.sv
-      - /path/to/file_2.sv
-      - /path/to/file_n.sv
 
     # Directory to load all Verilog files from the specified paths.
     - load_all_from:
-      - /path/to/directory_1
-      - /path/to/directory_2
-      - /path/to/directory_n
+      # - /home/loop/Documents/HW/ALU
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\RV32I
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Multiplexers
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Integer_Arithmetic
+      - D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu\Modules\Complements
 
   # Include directories for Verilog files. These usually contain shared macros or definitions.
   - verilog_include_dirs:
-      # Note: For .svh files the key `specific_files` is not functional yet.
-      # For now, use `load_all_from` to include all files within a directory.
+    # Section to specify individual include files.
     - specific_files:
-      # - /path/to/file_1.svh
-      # - /path/to/file_2.svh
-      # - /path/to/file_n.svh
 
     # Directory to load all include files from the specified paths.
     - load_all_from:
-      - /path/to/directory_1
-      - /path/to/directory_2
-      - /path/to/directory_n
 
 # Simulator to be used for the simulation. Options are 'verilator' or 'questa'.
 simulator: verilator
+# simulator: questa
 
-# Time scale and precision for the simulation (format: scale/precision).
+# Time scale and precision for the simulation (1ns for time, 1ps for precision).
+# timescale_timeprecision: 1ns/1ps
 timescale_timeprecision: 1ns/1ps
 
 # Name of the DUT (Device Under Test), which is the Verilog module being tested (do not use the extention).
-DUT_name: top_module_name
+DUT_name: ALU_RV32I
 
 # Name of the testbench template to be used for the DUT (do not use the extention).
-template_name: template_name
+template_name: tbs
 
 # Definition of DUT inputs.
 DUT_inputs:
   # List of clock signals that control the DUT.
   - clocks:
-    - clk_1
-    - clk_2
-    - clk_n
   
   # List of reset signals for the DUT.
   - resets:
-    - rst_1
-    - rst_2
-    - rst_n
-
+  
   # The rest of input signals.
-  - input_1
-  - input_2
-  - input_n
+  - op
+  - a  
+  - b
 
 # Definition of DUT outputs.
 DUT_outputs:
-  - output_0
-  - output_2
-  - output_n
+  - o
 
 test_error: (?i)error
 test_warning: (?i)warning
@@ -88,10 +77,10 @@ general_error: (?i)error
 general_warning: (?i)warning
 
 # Optional key
-# quartus\project\path
-quartus_project_path:
+# quartus_project_path:
+quartus_project_path: D:\D\Files\program_works\Logic_Circuit\Processors\RISCV\Quartus\CE4302-Project-II-main\cpu
 
 # Optional key
 # Define the command for synthesizability verification of the module.
-# Example: quartus_sh --flow compile <quartus_proyect_name>
-synthesizability_command: 
+synthesizability_command: quartus_sh --flow compile Logic_Circuit_Main
+# synthesizability_command:
